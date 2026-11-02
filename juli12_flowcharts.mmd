@@ -1,0 +1,114 @@
+# 酒店停車場管理系統 — 流程圖可編輯源碼（Mermaid）
+
+## 圖 1：系統整體運行與角色會話路由流程圖 (`src/main.cpp`, `src/menus.cpp`, `src/ordinary_user.cpp`, `src/admin_user.cpp`)
+
+```mermaid
+flowchart TD
+    Start(["程序啟動 main()"]) --> Load["調用 storage.Load(service)<br/>輸出 loaded.message"]
+    Load --> LoadOk{"loaded.ok 為真?"}
+    LoadOk -- "否 (載入/恢復失敗)" --> ExitErr1(["返回退出碼 1<br/>(保留原文件與 .bak，拒絕啟動)"])
+    LoadOk -- "是 (First run / Loaded / Recovered)" --> Banner["輸出計費規則橫幅:<br/>20 MOP/started hour, 400 MOP/24h block"]
+    Banner --> RolePrompt["頂層菜單循環 RunMenu()<br/>1 = ordinary, 2 = administrator, 0 = exit"]
+    RolePrompt --> RoleInput{"讀取角色選擇 choice"}
+    RoleInput -- "EOF 或 choice == 0" --> FinalSave["調用 storage.Save(service)<br/>輸出 saved.message"]
+    FinalSave --> FinalCheck{"saved.ok 為真?"}
+    FinalCheck -- "是" --> Exit0(["正常退出 (返回碼 0)"])
+    FinalCheck -- "否" --> Exit1(["異常退出 (返回碼 1)"])
+    RoleInput -- "choice == 1" --> OrdLoop["普通用戶會話 RunOrdinaryUserSession()<br/>1 = list, 2 = find, 3 = count, 0 = logout"]
+    OrdLoop --> OrdChoice{"讀取操作選項"}
+    OrdChoice -- "EOF" --> FinalSave
+    OrdChoice -- "0 (logout)" --> RolePrompt
+    OrdChoice -- "1 / 2 / 3" --> ReadOp["調用 RunReadChoice()<br/>查詢列表 / 單車查找 / 統計數量"]
+    ReadOp --> OrdLoop
+    OrdChoice -- "其他輸入 (如 4/5/6)" --> OrdInvalid["輸出 Invalid choice."] --> OrdLoop
+    RoleInput -- "choice == 2" --> AdmLoop["管理員會話 RunAdminUserSession()<br/>1=list, 2=find, 3=count, 4=add, 5=modify, 6=delete, 0=logout"]
+    AdmLoop --> AdmChoice{"讀取操作選項"}
+    AdmChoice -- "EOF" --> FinalSave
+    AdmChoice -- "0 (logout)" --> RolePrompt
+    AdmChoice -- "1 / 2 / 3 或無效選項" --> AdmRead["調用 RunReadChoice()<br/>執行共享查詢或輸出 Invalid choice."] --> AdmLoop
+    AdmChoice -- "4 / 5 / 6" --> AdmMut["執行管理員增/改/刪操作<br/>並立即調用 storage.Save(service)"] --> AdmLoop
+    RoleInput -- "其他無效輸入" --> TopInvalid["輸出 Invalid choice."] --> RolePrompt
+```
+
+## 圖 2：管理員增刪改（CRUD）與即時持久化流程圖 (`src/admin_user.cpp`, `src/parking_service.cpp`)
+
+```mermaid
+flowchart TD
+    Start(["管理員選擇 4=add / 5=modify / 6=delete"]) --> CheckOp{"choice != 4 ?"}
+    CheckOp -- "是 (5=modify 或 6=delete)" --> ReadKey["提示 Existing plate:<br/>讀取目標原車牌"]
+    CheckOp -- "否 (4=add)" --> ReadRec["調用 ReadRecord() 讀取:<br/>Plate, Category, Color, Entry time"]
+    ReadKey --> CheckDel{"choice == 6 (delete) ?"}
+    CheckDel -- "否 (5=modify)" --> ReadRec
+    CheckDel -- "是 (6=delete)" --> DoDel["調用 service.DeleteVehicle(Role::kAdmin, plate)<br/>校驗非空/無空格並從 std::map 移除"]
+    ReadRec --> Validate["調用 Validated(record, reference):<br/>1. NormalizeField() 禁控制字符/去首尾空格/禁車牌空格<br/>2. ParseTimestamp() 校驗 YYYY-MM-DD HH:MM 與閏年<br/>3. NormalizeToMinute() 攔截未來時間 (entry > ref)"]
+    Validate --> ValOk{"字段與時間校驗通過?"}
+    ValOk -- "否" --> ErrMsg["輸出對應錯誤提示:<br/>Invalid required field. / Invalid entry time. /<br/>Entry time is in the future.<br/>(原內存數據保持不變)"]
+    ValOk -- "是" --> CheckUniq["檢查 std::map 車牌存在性與唯一性:<br/>- add: 目標車牌是否已存在?<br/>- modify: 原車牌是否存在? 新車牌是否與他車衝突?"]
+    CheckUniq --> UniqOk{"唯一性/存在性通過?"}
+    UniqOk -- "否" --> UniqErr["輸出 Vehicle not found. 或<br/>Plate already exists.<br/>(原內存數據保持不變)"]
+    UniqOk -- "是" --> ApplyMem["更新 std::map<string, VehicleRecord> 內存狀態"]
+    DoDel --> DelOk{"刪除結果 == kOk ?"}
+    DelOk -- "否" --> ErrMsg
+    DelOk -- "是" --> SaveCall["立即調用 storage.Save(service)"]
+    ApplyMem --> SaveCall
+    SaveCall --> SaveOk{"saved.ok 為真?"}
+    SaveOk -- "是" --> OutSaved["輸出: Updated and saved. Parking data saved."]
+    SaveOk -- "否" --> OutWarn["輸出警告: Updated in memory, but save failed: <reason>"]
+    ErrMsg --> End(["返回管理員會話菜單"])
+    UniqErr --> End
+    OutSaved --> End
+    OutWarn --> End
+```
+
+## 圖 3：確定性停車時長與費用計算流程圖 (`src/fee_calculator.cpp`, `src/parking_service.cpp`)
+
+```mermaid
+flowchart TD
+    Start(["開始查詢 ListWithFees() 或 FindWithFee()"]) --> NormBoth["調用 NormalizeToMinute(entry, start)<br/>與 NormalizeToMinute(reference, end)<br/>(統一設 tm_sec = 0，對齊至本地整分鐘)"]
+    NormBoth --> NormOk{"時間歸一化成功?"}
+    NormOk -- "否" --> Fail(["返回 false / kInvalidTime<br/>(保持調用方輸出不變)"])
+    NormOk -- "是" --> Diff["計算秒數差: seconds = difftime(end, start)"]
+    Diff --> CheckValid{"seconds >= 0 且未溢出?"}
+    CheckValid -- "否 (負時長或溢出)" --> Fail
+    CheckValid -- "是" --> CalcMin["計算總停留分鐘數:<br/>total_minutes = seconds / 60"]
+    CalcMin --> SplitBlock["按 24 小時 (1440 分鐘) 週期拆分:<br/>days = total_minutes / 1440<br/>remainder = total_minutes % 1440"]
+    SplitBlock --> CalcDisplay["計算顯示用時長字段:<br/>hours = remainder / 60<br/>minutes = remainder % 60"]
+    CalcDisplay --> CalcPartial["計算剩餘部分向上取整計費小時數:<br/>started_hours = (remainder + 59) / 60<br/>partial = started_hours * 20"]
+    CalcPartial --> CapCheck["應用單個 24 小時週期 400 MOP 封頂:<br/>capped_partial = min(400, partial)"]
+    CapCheck --> TotalMop["計算總費用 (整數澳門元):<br/>mop = days * 400 + capped_partial"]
+    TotalMop --> Done(["寫入 ParkingFee 結果並返回 true"])
+```
+
+## 圖 4：本地文件載入、備份恢復與安全保存流程圖 (`src/storage.cpp`)
+
+```mermaid
+flowchart TD
+    subgraph LoadFlow ["A. 啟動載入與備份恢復 Storage::Load()"]
+        LStart(["開始 Load(): 預設 blocked_ = true"]) --> LCheck["檢查 parking_data.txt 與 .bak 是否存在"]
+        LCheck --> LNone{"兩者均不存在?"}
+        LNone -- "是 (首次運行)" --> LFirst["清空 service，設 blocked_ = false<br/>返回 First run: no parking data file."]
+        LNone -- "否" --> LParse["調用 ParseFile() 解析主文件<br/>(若主文件缺失則解析 .bak)"]
+        LParse --> LValid{"所有非空行均滿足 4 列 Tab、<br/>合法時間且車牌無重複?"}
+        LValid -- "否 (任一行損壞)" --> LFail["返回 Line N 錯誤提示<br/>(保持原狀態，維持 blocked_ = true)"]
+        LValid -- "是" --> LNeedRec{"主文件缺失 (從 .bak 載入)?"}
+        LNeedRec -- "是" --> LRenameBak["執行 rename(.bak -> parking_data.txt)<br/>失敗則保留 .bak 並維持 blocked_ = true"]
+        LNeedRec -- "否" --> LSuccess["提交記錄至 service，設 blocked_ = false<br/>返回 Loaded / Recovered 消息"]
+        LRenameBak -- "成功" --> LSuccess
+    end
+
+    subgraph SaveFlow ["B. 多步驟安全保存與失敗回滾協議 Storage::Save()"]
+        SStart(["開始 Save()"]) --> SBlocked{"blocked_ == true ?"}
+        SBlocked -- "是" --> SReject(["拒絕保存: Save blocked: resolve the<br/>load or recovery error and reload first."])
+        SBlocked -- "否" --> SWriteTmp["校驗內存快照並寫入 parking_data.txt.tmp<br/>(含 # PARKING_SYSTEM_V1 與升序 TSV 行)"]
+        SWriteTmp --> STmpOk{"寫入並 flush/close 成功?"}
+        STmpOk -- "否" --> SCleanTmp["刪除殘留 .tmp，保留原文件<br/>返回寫入失敗錯誤"]
+        STmpOk -- "是" --> STargetEx{"原 parking_data.txt 存在?"}
+        STargetEx -- "是" --> SVerifyCurr["調用 ParseFile() 檢查磁盤現有文件是否完好:<br/>若被外部改壞則設 blocked_=true、刪除 .tmp 並中止;<br/>否則移除舊 .bak 並將原文件重命名備份為 .bak"]
+        STargetEx -- "否" --> SCheckStaleBak["確認無意外殘留 .bak<br/>(若有則設 blocked_=true 並中止)"]
+        SVerifyCurr --> SReplace["執行 rename(.tmp -> parking_data.txt)"]
+        SCheckStaleBak --> SReplace
+        SReplace --> SRepOk{"替換成功?"}
+        SRepOk -- "否" --> SRollback["回滾: rename(.bak -> parking_data.txt)<br/>(若回滾也失敗則保留 .bak 並設 blocked_=true)"]
+        SRepOk -- "是" --> SRemoveBak["清理臨時 .bak<br/>返回 Parking data saved."]
+    end
+```

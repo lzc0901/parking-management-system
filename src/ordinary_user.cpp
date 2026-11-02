@@ -1,15 +1,31 @@
-#include "ordinary_user.h"
-#include "menus.h"
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "src/ordinary_user.h"
+
 #include <istream>
 #include <ostream>
 #include <string>
 
-bool runOrdinaryUserSession(std::istream& in, std::ostream& out, const ParkingService& service) {
-    std::string choice;
-    while (true) {
-        out << "Ordinary user session: 1 = list, 2 = find, 3 = count, 0 = logout\n> ";
-        if (!std::getline(in, choice)) return false;
-        if (choice == "0") return true;
-        if (!runReadChoice(choice, in, out, service)) return false;
-    }
+#include "src/menus.h"
+
+bool RunOrdinaryUserSession(std::istream& in, std::ostream& out,
+                            const ParkingService& service) {
+  std::string choice;
+  while (true) {
+    out << "Ordinary user session: 1 = list, 2 = find, 3 = count, 0 = "
+           "logout\n> ";
+    if (!std::getline(in, choice)) return false;
+    if (choice == "0") return true;
+    if (!RunReadChoice(choice, in, out, service)) return false;
+  }
 }

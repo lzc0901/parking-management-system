@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>酒店停車場管理系統 — 系統開發報告與使用說明書</title>
+<style>
+  @page {
+    size: A4;
+    margin: 13mm 14mm 13mm 14mm;
+  }
+  body {
+    font-family: "Microsoft JhengHei", "Microsoft YaHei", "PingFang TC", sans-serif;
+    font-size: 9.8pt;
+    line-height: 1.47;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 18pt;
+    color: #1e3a8a;
+    border-bottom: 2.5px solid #1e3a8a;
+    padding-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 13.5pt;
+    color: #1e3a8a;
+    background: #eff6ff;
+    border-left: 4px solid #1d4ed8;
+    padding: 5px 10px;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 11.2pt;
+    color: #0f172a;
+    margin-top: 11px;
+    margin-bottom: 5px;
+    break-after: avoid;
+  }
+  p, li {
+    margin-top: 3px;
+    margin-bottom: 5px;
+  }
+  ul, ol {
+    padding-left: 20px;
+    margin-top: 3px;
+    margin-bottom: 6px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 8.9pt;
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  th, td {
+    border: 1px solid #94a3b8;
+    padding: 5px 7px;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: break-word;
+  }
+  th {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8.6pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+    overflow-wrap: break-word;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 7px 10px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    font-size: 8.4pt;
+    line-height: 1.38;
+    margin: 6px 0 10px 0;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    word-break: normal;
+  }
+  blockquote {
+    margin: 8px 0;
+    padding: 6px 12px;
+    background: #fefce8;
+    border-left: 4px solid #eab308;
+    font-size: 9.5pt;
+  }
+  svg {
+    page-break-inside: avoid;
+    margin: 8px auto 12px auto;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #cbd5e1;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<h1>酒店停車場管理系統 — 系統開發報告與使用說明書</h1>
+<p><strong>課程名稱</strong>：高級編程與軟件工程（期末項目）<br />
+<strong>項目名稱</strong>：澳門本地酒店停車場管理系統（C++17 控制台與本地持久化實現）<br />
+<strong>開發團隊</strong>：Parking Management Development Team<br />
+<strong>驗證基準快照</strong>：<code>e06-source.zip</code>（SHA-256: <code>844645d20ca75de8d3b28a90815040f3e4d4be5da9a4a7904ae201ea6aec593e</code>）及 <code>JULI-17</code> Google C++ Style 已審提交 <code>df3a71477b3635c93c64305f2e941f0ccb5f88b2</code>（<code>refs/juli17/style</code>，源碼樹 <code>f805a58a4b143902fedd0b28d0586e59ad32ab1d</code>）</p>
+<hr />
+<h2>第一章 項目背景與需求分析</h2>
+<h3>1.1 項目背景與作業要求</h3>
+<p>根據《高級編程與軟件工程期末項目》任務書（<code>高級編程期末項目(1)(1).pdf</code>），澳門本地某酒店需開發一套停車場管理系統，包含<strong>汽車信息模塊（1.1）</strong>、<strong>普通用戶模塊（1.2）<strong>和</strong>管理員用戶模塊（1.3）</strong>三項基本功能模塊，建議分開建立文件進行編程，並提交：</p>
+<ol>
+<li><strong>源代碼文件（50%）</strong>：對程序語句或模塊進行合理注釋或解釋，基於 <strong>C++17</strong> 編譯並運行無報錯。</li>
+<li><strong>全流程演示錄屏（10%）</strong>：使用普通用戶及管理員用戶進行汽車信息錄入、查詢與刪減等全流程演示並錄屏（覆蓋 3 個基本模塊的所有功能）。</li>
+<li><strong>系統開發報告與使用說明 PDF（40%）</strong>：梳理開發邏輯，畫出系統整體及部分的簡單流程圖並進行說明，討論系統內可優化的邏輯及代碼部分，並附完整使用說明書。</li>
+</ol>
+<h3>1.2 需求追蹤與實現覆蓋矩陣（M01–M10）</h3>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">編號</th>
+  <th style="text-align:left">課程作業需求描述</th>
+  <th style="text-align:left">實現模組與源代碼定位</th>
+  <th style="text-align:left">驗證狀態與證據</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong>M01</strong></td>
+  <td style="text-align:left"><strong>添加汽車信息</strong>：錄入車牌號、汽車品類（轎車、SUV 等）、汽車顏色、停車時間點（採用手動輸入車牌號方案，排除可選 OpenCV 識別）。</td>
+  <td style="text-align:left"><code>src/vehicle.h/.cpp</code>、<code>src/parking_service.h/.cpp</code> (<code>AddVehicle</code>)、<code>src/admin_user.cpp</code> (<code>ReadRecord</code>)</td>
+  <td style="text-align:left">已通過單元測試 (<code>tests/test_main.cpp</code>) 與多進程端到端測試 (<code>tests/test_e2e.ps1</code>)。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M02</strong></td>
+  <td style="text-align:left"><strong>顯示、刪除、查找、修改汽車資訊</strong>：輸入停車場中存在的車牌號，對汽車資訊進行顯示、查找、修改、刪除操作。</td>
+  <td style="text-align:left"><code>src/parking_service.h/.cpp</code> (<code>ListWithFees</code>, <code>FindWithFee</code>, <code>ModifyVehicle</code>, <code>DeleteVehicle</code>)、<code>src/menus.cpp</code></td>
+  <td style="text-align:left">已通過 CRUD、改名衝突拒絕與空車庫保護測試 (<code>tests/test_main.cpp</code>, <code>tests/test_menus.cpp</code>)。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M03</strong></td>
+  <td style="text-align:left"><strong>停車時長統計</strong>：顯示汽車在停車場中停留的時間（<code>X days Y hours Z minutes</code>）和當前在場車輛總數（<code>Current count</code>）。</td>
+  <td style="text-align:left"><code>src/fee_calculator.h/.cpp</code> (<code>CalculateParkingFee</code>)、<code>src/parking_service.h</code> (<code>Count()</code>)</td>
+  <td style="text-align:left">已通過 12 組邊界時長與數量不變量測試 (<code>tests/test_main.cpp</code>)。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M04</strong></td>
+  <td style="text-align:left"><strong>汽車資訊保存</strong>：將汽車資訊保存到本地檔 <code>parking_data.txt</code> 中，並支持跨進程重啟載入與 <code>.bak</code> 故障恢復。</td>
+  <td style="text-align:left"><code>src/storage.h/.cpp</code> (<code>Storage::Load</code>, <code>Storage::Save</code>)、<code>src/main.cpp</code></td>
+  <td style="text-align:left">已通過持久化與異常恢復專項測試 (<code>tests/test_storage.cpp</code>) 及 3 進程重啟測試 (<code>tests/test_e2e.ps1</code>)。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M05</strong></td>
+  <td style="text-align:left"><strong>普通用戶模塊（1.2）</strong>：查詢、顯示所有汽車資訊及停車費資訊（每小時 20 MOP，每連續 24 小時封頂 400 MOP），停車時長統計，退出普通用戶登錄。</td>
+  <td style="text-align:left"><code>src/ordinary_user.h/.cpp</code> (<code>RunOrdinaryUserSession</code>)、<code>src/menus.cpp</code> (<code>RunReadChoice</code>)</td>
+  <td style="text-align:left">已通過普通用戶只讀會話、費用顯示與登出測試 (<code>tests/test_menus.cpp</code>, <code>tests/test_e2e.ps1</code>)。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M06</strong></td>
+  <td style="text-align:left"><strong>管理員用戶模塊（1.3）</strong>：具備普通用戶模塊的所有功能，並具有增（<code>4</code>）、改（<code>5</code>）、刪（<code>6</code>）功能及即時保存。</td>
+  <td style="text-align:left"><code>src/admin_user.h/.cpp</code> (<code>RunAdminUserSession</code>)、<code>src/parking_service.cpp</code> (<code>Role::kAdmin</code> 校驗)</td>
+  <td style="text-align:left">已通過服務層權限攔截 (<code>Role::kOrdinaryUser</code> 返回 <code>kForbidden</code>) 與管理員全流程測試。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M07</strong></td>
+  <td style="text-align:left"><strong>分文件編程、代碼注釋與無報錯運行（50%）</strong>：C++17 標準庫實現，3 大模塊分文件組織，遵循 Google C++ Style（含已批准 <code>&lt;filesystem&gt;</code> 項目級例外），開啟 <code>-Wall -Wextra -pedantic</code> 零警告零報錯。</td>
+  <td style="text-align:left"><code>src/*.h</code>、<code>src/*.cpp</code>（共 15 個源文件）、<code>tests/*</code>（4 個測試文件）</td>
+  <td style="text-align:left"><code>g++ -std=c++17 -Wall -Wextra -pedantic -I.</code> 零警告編譯通過，4 套測試全部 <code>PASS</code>。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M08</strong></td>
+  <td style="text-align:left"><strong>全流程演示錄屏（10%）</strong>：覆蓋普通用戶與管理員全部功能的實際終端錄屏。</td>
+  <td style="text-align:left">演示腳本與檢查表（<code>JULI-13</code>）、實機錄屏（<code>JULI-14</code>）</td>
+  <td style="text-align:left">由獨立演示腳本與實機錄製覆蓋全部必選功能。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M09</strong></td>
+  <td style="text-align:left"><strong>系統開發報告與使用說明 PDF（40%）</strong>：含開發邏輯、整體與部分流程圖、優化討論及使用說明書。</td>
+  <td style="text-align:left">本報告（<code>juli12_development_report_zh.md</code> / <code>.pdf</code>）及流程圖源碼（<code>juli12_flowcharts.mmd</code>、<code>juli12_flowchart_1_overall.svg</code> 至 <code>juli12_flowchart_4_storage.svg</code>）</td>
+  <td style="text-align:left">全部頁面經渲染與逐頁視覺檢查確認排版清晰、圖表完整，Markdown 相對 SVG 引用通過自動檢查。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>M10</strong></td>
+  <td style="text-align:left"><strong>小組提交規範</strong>：由指定小組成員在截止日前將最新代碼、錄屏與 PDF 上傳至暢課（Changke）。</td>
+  <td style="text-align:left">最終提交包審計（<code>JULI-15</code>、<code>JULI-16</code>、<code>JULI-18</code>）</td>
+  <td style="text-align:left">保持代碼、測試、報告與錄屏版本一致，待人工最終確認後上傳。</td>
+</tr>
+</tbody>
+</table>
+<h3>1.3 已批准的設計決策與範圍邊界</h3>
+<ol>
+<li><strong>收費規則（Approved Fee Policy）</strong>：每開始一小時（per started hour）收費 <strong>20 MOP</strong>，每個連續 24 小時（1440 分鐘）週期封頂 <strong>400 MOP</strong>；超過 24 小時後的下一個週期按相同規則累計（例如 24 小時 1 分鐘 = <code>400 + 20 = 420 MOP</code>）。0 分鐘收費 <code>0 MOP</code>，負時長拒絕。</li>
+<li><strong>角色會話與登出模型（Role Session Model）</strong>：採用本地角色選擇會話（<code>1 = ordinary</code>、<code>2 = administrator</code>、<code>0 = exit</code>），每個角色會話內均提供顯式登出（<code>0 = logout</code>）返回頂層菜單，不額外引入未要求的密碼賬號註冊子系統。</li>
+<li><strong>嚴格排除的可選功能</strong>：不引入 OpenCV 圖像識別、GUI、網絡服務、外部數據庫、車位容量上限攔截或歷史離場歸檔表，確保核心業務邏輯純粹、可重複驗證。</li>
+</ol>
+<hr />
+<h2>第二章 系統整體架構與模塊劃分</h2>
+<h3>2.1 分層與分文件設計</h3>
+<p>為滿足作業「建議分開建立文件進行編程」的要求並遵循軟件工程高內聚、低耦合原則，系統將控制台交互（Presentation）、業務規則與權限控制（Service/Domain）、計費算法（Fee Calculation）及本地持久化（Storage）拆分為 15 個獨立的 <code>.h</code> / <code>.cpp</code> 源文件（7 個頭文件與 8 個實現文件）：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">模塊歸屬</th>
+  <th style="text-align:left">源文件名稱</th>
+  <th style="text-align:left">核心職責與導出接口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong>程序入口</strong></td>
+  <td style="text-align:left"><code>src/main.cpp</code></td>
+  <td style="text-align:left">初始化 <code>ParkingService</code> 與 <code>Storage</code>，啟動時調用 <code>storage.Load(service)</code>（失敗則輸出錯誤並以狀態碼 <code>1</code> 退出），進入 <code>RunMenu()</code> 主循環，正常退出時執行 <code>storage.Save(service)</code>。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>會話路由與共享查詢展示</strong></td>
+  <td style="text-align:left"><code>src/menus.h</code> / <code>src/menus.cpp</code></td>
+  <td style="text-align:left"><code>RunMenu()</code> 輸出計費規則橫幅並維護頂層角色選擇循環（<code>1 = ordinary, 2 = administrator, 0 = exit</code>）；<code>RunReadChoice()</code> 封裝兩個角色共享的只讀操作（<code>1 = list</code>、<code>2 = find</code>、<code>3 = count</code>）與統一格式化輸出 <code>Show()</code>。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.2 普通用戶模塊</strong></td>
+  <td style="text-align:left"><code>src/ordinary_user.h</code> / <code>src/ordinary_user.cpp</code></td>
+  <td style="text-align:left"><code>RunOrdinaryUserSession()</code> 接收只讀引用 <code>const ParkingService&amp;</code>（無 <code>Storage</code> 引用），僅暴露查詢與統計菜單（<code>1 = list, 2 = find, 3 = count, 0 = logout</code>），在編譯期與運行期雙重杜絕普通用戶修改數據。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.3 管理員用戶模塊</strong></td>
+  <td style="text-align:left"><code>src/admin_user.h</code> / <code>src/admin_user.cpp</code></td>
+  <td style="text-align:left"><code>RunAdminUserSession()</code> 接收可寫 <code>ParkingService&amp;</code> 與 <code>Storage&amp;</code>，支持共享查詢（<code>1–3</code>）與管理員專屬增（<code>4</code>）、改（<code>5</code>）、刪（<code>6</code>）及登出（<code>0</code>）。每次修改成功後立即調用 <code>storage.Save(service)</code>，若保存失敗則輸出明確的「僅內存更新」警告。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.1 汽車信息模塊 — 數據與時間校驗</strong></td>
+  <td style="text-align:left"><code>src/vehicle.h</code> / <code>src/vehicle.cpp</code></td>
+  <td style="text-align:left">定義 <code>VehicleRecord</code> 結構體；實現 <code>NormalizeField()</code>（拒絕控制字符、裁剪首尾空格、禁止車牌內部空格）、<code>ParseTimestamp()</code>（16 位 <code>YYYY-MM-DD HH:MM</code> 格式、公曆閏年天數與 <code>std::mktime</code> 往返校驗）及 <code>NormalizeToMinute()</code>（本地整分鐘歸一化）。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.1 汽車信息模塊 — 核心業務服務</strong></td>
+  <td style="text-align:left"><code>src/parking_service.h</code> / <code>src/parking_service.cpp</code></td>
+  <td style="text-align:left">定義 <code>Role</code>、<code>VehicleResult</code> 枚舉與 <code>VehicleFeeView</code>；<code>ParkingService</code> 內部使用 <code>std::map&lt;std::string, VehicleRecord&gt;</code> 按車牌升序存儲在場車輛，集中執行 <code>Role::kAdmin</code> 權限檢查、字段/時間校驗、未來時間攔截、主鍵唯一性檢查及批量/單車計費查詢。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.1 汽車信息模塊 — 時長與計費計算</strong></td>
+  <td style="text-align:left"><code>src/fee_calculator.h</code> / <code>src/fee_calculator.cpp</code></td>
+  <td style="text-align:left">定義 <code>ParkingFee</code> 結構體；實現無狀態純函數 <code>CalculateParkingFee(entry, reference, result)</code>，不依賴全局系統時鐘，便於確定性單元測試。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.1 汽車信息模塊 — 本地文件持久化</strong></td>
+  <td style="text-align:left"><code>src/storage.h</code> / <code>src/storage.cpp</code></td>
+  <td style="text-align:left">定義 <code>StorageResult</code> 與 <code>Storage</code> 類；實現 <code># PARKING_SYSTEM_V1</code> TSV 文件的全有或全無（All-or-Nothing）載入、啟動 <code>.bak</code> 自動恢復、保存前快照校驗、<code>.tmp</code> 臨時文件寫入、<code>.bak</code> 備份與失敗回滾，以及異常後的 <code>blocked_</code> 寫入鎖定保護。</td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 核心數據結構設計</h3>
+<ol>
+<li><strong>車輛記錄結構體（<code>VehicleRecord</code>，定義於 <code>src/vehicle.h:20-26</code>）</strong>：<pre><code class="language-cpp">struct VehicleRecord {
+  std::string plate;             // 車牌號（唯一主鍵，無內部空格）
+  std::string category;          // 汽車品類（如 轎車、SUV）
+  std::string color;             // 汽車顏色（如 黑色、白色）
+  std::string entry_time_text;   // 標準化入場時間文本 (YYYY-MM-DD HH:MM)
+  std::time_t entry_timestamp{}; // 歸一化至本地整分鐘 (tm_sec = 0) 的時間戳
+};
+</code></pre>
+</li>
+<li><strong>計費結果結構體（<code>ParkingFee</code>，定義於 <code>src/fee_calculator.h:19-26</code>）</strong>：<pre><code class="language-cpp">struct ParkingFee {
+  std::int64_t total_minutes = 0;                 // 總停留分鐘數
+  std::int64_t days = 0;                          // 完整 24 小時天數 (total_minutes / 1440)
+  int hours = 0;                                  // 剩餘部分小時數 ((total_minutes % 1440) / 60)
+  int minutes = 0;                                // 剩餘部分分鐘數 (total_minutes % 60)
+  int started_hours_in_partial_block = 0;         // 剩餘部分向上取整計費小時數
+  std::int64_t mop = 0;                           // 應收澳門元整數金額 (MOP)
+};
+</code></pre>
+</li>
+<li><strong>內存容器選型（<code>std::map&lt;std::string, VehicleRecord&gt;</code>）</strong>：
+<code>ParkingService</code> 選用標準庫紅黑樹映射 <code>std::map</code> 以車牌 <code>plate</code> 作為鍵，保證按車牌查找、插入、刪除的時間複雜度為 <code>O(log N)</code>，且在執行列表顯示（<code>ListAll</code> / <code>ListWithFees</code>）與文件落盤（<code>Storage::Save</code>）時天然保持確定性的車牌字典序升序輸出。</li>
+</ol>
+<hr />
+<h2>第三章 系統整體與核心模塊流程圖及開發邏輯說明</h2>
+<p>本章節繪製了系統整體控制流與三個關鍵子模塊（管理員增刪改查與保存、確定性時長與費用計算、本地文件載入與安全保存）的流程圖，所有分支、提示與內部符號均與已通過審查的 <code>E06</code> / <code>JULI-17</code> 代碼完全一致。</p>
+<h3>3.1 系統整體運行與角色會話路由流程圖（Overall System Flowchart）</h3>
+<p><strong>邏輯說明（對應 <code>src/main.cpp</code>、<code>src/menus.cpp</code>、<code>src/ordinary_user.cpp</code>、<code>src/admin_user.cpp</code>）</strong>：</p>
+<ol>
+<li>程序啟動後首先調用 <code>storage.Load(service)</code> 檢查並載入 <code>parking_data.txt</code>（若主文件缺失但 <code>.bak</code> 存在則自動恢復）。若文件損壞或無法讀取，輸出具體行號/原因並直接返回退出碼 <code>1</code>，絕不覆蓋損壞文件。</li>
+<li>載入成功後，打印收費標準說明，進入 <code>RunMenu</code> 頂層角色選擇循環：輸入 <code>1</code> 進入普通用戶會話，輸入 <code>2</code> 進入管理員會話，輸入 <code>0</code> 或遇到 <code>EOF</code> 退出循環。</li>
+<li>普通用戶會話僅能執行 <code>1 = list</code>、<code>2 = find</code>、<code>3 = count</code> 與 <code>0 = logout</code>；管理員會話除上述三項外還可執行 <code>4 = add</code>、<code>5 = modify</code>、<code>6 = delete</code>，且每次寫操作成功後立即觸發 <code>storage.Save(service)</code>。</li>
+<li>頂層菜單退出時，主函數再次調用 <code>storage.Save(service)</code> 確認落盤並根據保存結果返回退出碼 <code>0</code> 或 <code>1</code>。</li>
+</ol>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 700" style="width:100%; max-width:910px; height:auto; display:block; margin:8px auto; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="910" height="34" rx="8" ry="8" fill="#1e3a8a"/>
+  <text x="455.0" y="22" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff">圖 1：系統整體運行與角色會話路由流程圖 (Overall System Flowchart)</text>
+  <rect x="310" y="48" width="280" height="40" rx="20" ry="20" fill="#dbeafe" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="450.0" y="61.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">程序啟動 main()</text>
+<text x="450.0" y="78.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">初始化 ParkingService 與 Storage</text>
+<path d="M 450,88 L 450,110" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="260" y="110" width="380" height="44" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="450.0" y="125.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">調用 storage.Load(service)</text>
+<text x="450.0" y="142.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">輸出 loaded.message (First run / Loaded / Recovered)</text>
+<path d="M 450,154 L 450,178" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="450,179.0 550.0,208 450,237.0 350.0,208" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="450" y="209.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">loaded.ok 為真?</text>
+<path d="M 550,208 L 645,208" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="555" y="198" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否 (載入失敗)</text>
+<rect x="645" y="182" width="240" height="52" rx="8" ry="8" fill="#fee2e2" stroke="#991b1b" stroke-width="1.8"/>
+<text x="765.0" y="201.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">直接返回退出碼 1</text>
+<text x="765.0" y="218.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">保留原文件與 .bak，拒絕啟動</text>
+<path d="M 450,237 L 450,262" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="458" y="253" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是</text>
+<rect x="240" y="262" width="420" height="44" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="450.0" y="277.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">輸出收費規則橫幅 (20 MOP/h, 400 MOP/24h cap)</text>
+<text x="450.0" y="294.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">進入頂層角色菜單: 1 = ordinary, 2 = administrator, 0 = exit</text>
+<path d="M 450,306 L 450,330" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="450,330.0 565.0,362 450,394.0 335.0,362" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="450" y="363.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">讀取頂層選擇 choice</text>
+<path d="M 335,362 L 165,362 L 165,415" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="180" y="353" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">choice == 1 (普通用戶)</text>
+<rect x="28" y="415" width="275" height="50" rx="8" ry="8" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.8"/>
+<text x="165.5" y="433.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">普通用戶會話 RunOrdinaryUserSession()</text>
+<text x="165.5" y="450.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">1=list, 2=find, 3=count, 0=logout</text>
+<path d="M 165,465 L 165,490" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="28" y="490" width="275" height="68" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="165.5" y="501.8" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 1/2/3: RunReadChoice() 查詢車輛/費用/總數</text>
+<text x="165.5" y="517.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 其他輸入 (如 4/5/6): 輸出 Invalid choice.</text>
+<text x="165.5" y="533.2" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 0 (logout): 返回頂層角色選擇菜單</text>
+<text x="165.5" y="548.9" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• EOF: 安全結束會話並進入退出保存</text>
+<path d="M 28,524 L 12,524 L 12,284 L 240,284" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="18" y="395" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">0 = logout</text>
+<path d="M 565,362 L 735,362 L 735,415" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="585" y="353" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">choice == 2 (管理員)</text>
+<rect x="585" y="415" width="302" height="50" rx="8" ry="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+<text x="736.0" y="433.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">管理員會話 RunAdminUserSession()</text>
+<text x="736.0" y="450.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">1..3=查詢, 4=add, 5=modify, 6=delete, 0=logout</text>
+<path d="M 735,465 L 735,490" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="585" y="490" width="302" height="68" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="736.0" y="501.8" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 1/2/3: RunReadChoice() 共享查詢與統計</text>
+<text x="736.0" y="517.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 4/5/6: 執行增/改/刪並立即 storage.Save()</text>
+<text x="736.0" y="533.2" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 0 (logout): 返回頂層角色選擇菜單</text>
+<text x="736.0" y="548.9" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 其他輸入: 輸出 Invalid choice. | EOF: 結束會話</text>
+<path d="M 887,524 L 898,524 L 898,284 L 660,284" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="828" y="395" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">0 = logout</text>
+<path d="M 450,394 L 450,582" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="340" y="445" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">choice == 0 或 EOF</text>
+<rect x="265" y="582" width="370" height="44" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="450.0" y="597.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">退出前調用 storage.Save(service)</text>
+<text x="450.0" y="614.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">輸出 saved.message (Parking data saved. 或錯誤)</text>
+<path d="M 450,626 L 450,648" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="290" y="648" width="320" height="38" rx="18" ry="18" fill="#dbeafe" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="450.0" y="668.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">saved.ok ? 返回退出碼 0 : 返回退出碼 1</text>
+</svg>
+<hr />
+<h3>3.2 管理員增刪改（CRUD）與即時持久化流程圖（Module Flowchart 1）</h3>
+<p><strong>邏輯說明（對應 <code>src/admin_user.cpp:58-92</code> 與 <code>src/parking_service.cpp:20-85</code>）</strong>：</p>
+<ol>
+<li>在管理員會話中選擇 <code>4</code>（添加）、<code>5</code>（修改）或 <code>6</code>（刪除）。若為 <code>5</code> 或 <code>6</code>，首先讀取目標車牌 <code>Existing plate</code>；若為 <code>4</code> 或 <code>5</code>，調用 <code>ReadRecord()</code> 讀取四項字段（<code>Plate</code>、<code>Category</code>、<code>Color</code>、<code>Entry time</code>）。</li>
+<li><code>ParkingService</code> 首先在服務層入口強制檢查 <code>role == Role::kAdmin</code>（若非管理員則返回 <code>VehicleResult::kForbidden</code>）。</li>
+<li>調用 <code>Validated()</code> 進行三層嚴格校驗：<ul>
+<li><code>NormalizeField()</code>：拒絕任何 ASCII 控制字符（<code>&lt; 0x20</code> 或 <code>0x7F</code>），裁剪首尾空格，拒絕空字串，並禁止 <code>plate</code> 內部包含空格。</li>
+<li><code>ParseTimestamp()</code>：檢查 16 字符 <code>YYYY-MM-DD HH:MM</code> 語法、公曆每月天數（含閏年 2 月 29 日規則）及 <code>std::mktime</code> 往返一致性。</li>
+<li><code>NormalizeToMinute()</code>：將系統當前參考時間歸一化至整分鐘，若 <code>entry_timestamp &gt; minute</code> 則判定為未來時間並返回 <code>VehicleResult::kFutureTime</code>。</li>
+</ul>
+</li>
+<li>檢查車牌存在性與唯一性：添加時若車牌已存在，或修改車牌名稱時新車牌與其他在場車輛衝突，均返回 <code>kDuplicatePlate</code>，且<strong>保持原內存數據不變</strong>。</li>
+<li>內存更新成功後，立即調用 <code>storage.Save(service)</code>：若保存成功則輸出 <code>Updated and saved. Parking data saved.</code>；若磁盤保存失敗，輸出警告 <code>Updated in memory, but save failed: &lt;reason&gt;</code>，明確告知用戶變更僅在內存生效而未落盤。</li>
+</ol>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 742" style="width:100%; max-width:910px; height:auto; display:block; margin:8px auto; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="910" height="34" rx="8" ry="8" fill="#1e3a8a"/>
+  <text x="455.0" y="22" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff">圖 2：管理員增刪改（CRUD）與即時持久化流程圖 (CRUD &amp; Persistence Flowchart)</text>
+  <rect x="280" y="46" width="350" height="40" rx="18" ry="18" fill="#dbeafe" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="67.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">管理員輸入 4 = add / 5 = modify / 6 = delete</text>
+<path d="M 455,86 L 455,108" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="215" y="108" width="480" height="48" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="125.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">讀取控制台輸入參數 (EOF 則立即中止返回 false):</text>
+<text x="455.0" y="142.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">• 若 5 或 6: 讀取 Existing plate  |  • 若 4 或 5: 調用 ReadRecord() 讀取四項字段</text>
+<path d="M 455,156 L 455,178" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="235" y="178" width="440" height="42" rx="8" ry="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.8"/>
+<text x="455.0" y="192.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">ParkingService 入口權限檢查: role == Role::kAdmin ?</text>
+<text x="455.0" y="209.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">(非 Admin 立即返回 VehicleResult::kForbidden -&gt; Permission denied.)</text>
+<path d="M 455,220 L 455,242" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="455,243.0 565.0,272 455,301.0 345.0,272" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="455" y="273.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">操作類型為 6 (delete) ?</text>
+<path d="M 345,272 L 170,272 L 170,322" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="210" y="264" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是 (6 = delete)</text>
+<rect x="25" y="322" width="290" height="52" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="170.0" y="341.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">DeleteVehicle(Role::kAdmin, plate)</text>
+<text x="170.0" y="357.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">校驗車牌非空/無空格，在 std::map 查找並移除</text>
+<path d="M 455,301 L 455,322" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="463" y="315" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否 (4 = add / 5 = modify)</text>
+<rect x="330" y="322" width="555" height="68" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="607.5" y="333.7" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="bold" fill="#0f172a">調用 Validated(record, reference) 執行三層輸入校驗:</text>
+<text x="607.5" y="349.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="normal" fill="#0f172a">1. NormalizeField(): 禁控制字符 (&lt;0x20, 0x7F)、去首尾空格、禁空值、禁車牌內部空格</text>
+<text x="607.5" y="365.3" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="normal" fill="#0f172a">2. ParseTimestamp(): 校驗 16 位 YYYY-MM-DD HH:MM 語法、公曆閏年天數與 mktime 往返</text>
+<text x="607.5" y="381.1" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="normal" fill="#0f172a">3. NormalizeToMinute(): 參考時間對齊至整分鐘，若 entry &gt; reference 返回 kFutureTime</text>
+<path d="M 607,390 L 607,412" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="330" y="412" width="555" height="52" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="607.5" y="423.6" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="bold" fill="#0f172a">檢查 std::map&lt;string, VehicleRecord&gt; 存在性與車牌唯一性:</text>
+<text x="607.5" y="439.40000000000003" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="normal" fill="#0f172a">• add: 車牌已存在 -&gt; kDuplicatePlate</text>
+<text x="607.5" y="455.20000000000005" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.3" font-weight="normal" fill="#0f172a">• modify: 原車牌不存在 -&gt; kNotFound; 新車牌與他車衝突 -&gt; kDuplicatePlate</text>
+<path d="M 170,374 L 170,505 L 345,505" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 607,464 L 607,505 L 565,505" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="455,476.0 565.0,505 455,534.0 345.0,505" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="455" y="506.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">業務執行結果 == kOk ?</text>
+<path d="M 345,518 L 180,555" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="190" y="535" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否 (校驗或查找失敗)</text>
+<rect x="25" y="555" width="315" height="68" rx="8" ry="8" fill="#fee2e2" stroke="#991b1b" stroke-width="1.8"/>
+<text x="182.5" y="566.8000000000001" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="bold" fill="#0f172a">原內存數據保持不變，輸出精確英文提示:</text>
+<text x="182.5" y="582.5000000000001" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">Invalid required field. / Invalid entry time. /</text>
+<text x="182.5" y="598.2" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">Entry time is in the future. / Plate already exists. /</text>
+<text x="182.5" y="613.9000000000001" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">Vehicle not found.</text>
+<path d="M 565,518 L 665,555" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="585" y="535" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是 (內存已更新)</text>
+<rect x="495" y="555" width="375" height="44" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="682.5" y="578.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">立即調用 storage.Save(service) 同步持久化至磁盤</text>
+<path d="M 682,599 L 682,622" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="682,622.0 777.0,648 682,674.0 587.0,648" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="682" y="649.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">saved.ok 為真?</text>
+<path d="M 587,648 L 470,648" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="535" y="640" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是</text>
+<rect x="205" y="626" width="265" height="44" rx="8" ry="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+<text x="337.5" y="641.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">輸出成功提示:</text>
+<text x="337.5" y="657.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">Updated and saved. Parking data saved.</text>
+<path d="M 777,648 L 777,685" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="785" y="668" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否 (保存失敗)</text>
+<rect x="495" y="685" width="390" height="44" rx="8" ry="8" fill="#ffedd5" stroke="#c2410c" stroke-width="1.8"/>
+<text x="690.0" y="700.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">輸出僅內存更新警告:</text>
+<text x="690.0" y="716.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">Updated in memory, but save failed: &lt;reason&gt;</text>
+</svg>
+<hr />
+<h3>3.3 確定性停車時長與費用計算流程圖（Module Flowchart 2）</h3>
+<p><strong>邏輯說明（對應 <code>src/fee_calculator.cpp:22-45</code> 與 <code>src/parking_service.cpp:99-124</code>）</strong>：</p>
+<ol>
+<li>批量列表查詢 <code>ListWithFees()</code> 在開始時僅捕獲一次參考時間戳並歸一化至本地整分鐘，確保同一張列表內所有車輛的時長與費用基於完全一致的時間基準。</li>
+<li><code>CalculateParkingFee(entry, reference, result)</code> 將入場時間 <code>entry</code> 與參考時間 <code>reference</code> 均通過 <code>NormalizeToMinute()</code> 抹除秒數（設 <code>tm_sec = 0</code>），消除實時秒數引起的跨分鐘/跨小時邊界抖動。</li>
+<li>計算秒數差 <code>seconds = std::difftime(end, start)</code>：若 <code>seconds &lt; 0</code>（負時長）、非有限值或超出整數安全上限，立即返回 <code>false</code> 並保持調用方輸出結構體不變。</li>
+<li>將總分鐘數 <code>total_minutes = seconds / 60</code> 拆分為：<ul>
+<li>完整 24 小時天數：<code>days = total_minutes / 1440</code>（每天固定收費 <code>400 MOP</code>）。</li>
+<li>剩餘不滿一天分鐘數：<code>remainder = total_minutes % 1440</code>，折算為顯示小時 <code>hours = remainder / 60</code> 與顯示分鐘 <code>minutes = remainder % 60</code>。</li>
+<li>剩餘部分向上取整計費小時數：<code>started_hours = (remainder + 59) / 60</code>，部分費用 <code>partial = min(400, started_hours * 20)</code>。</li>
+<li>總費用：<code>mop = days * 400 + partial</code>。</li>
+</ul>
+</li>
+</ol>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 476" style="width:100%; max-width:910px; height:auto; display:block; margin:8px auto; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="910" height="34" rx="8" ry="8" fill="#1e3a8a"/>
+  <text x="455.0" y="22" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff">圖 3：確定性停車時長與費用計算流程圖 (Deterministic Duration &amp; Fee Flowchart)</text>
+  <rect x="225" y="46" width="460" height="42" rx="18" ry="18" fill="#dbeafe" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="60.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">查詢入口: ListWithFees(ref) 或 FindWithFee(plate, ref)</text>
+<text x="455.0" y="77.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">捕獲單一參考時間戳 reference，確保同次查詢基準一致</text>
+<path d="M 455,88 L 455,110" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="195" y="110" width="520" height="46" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="126.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="#0f172a">調用 NormalizeToMinute(entry, start) 與 NormalizeToMinute(reference, end)</text>
+<text x="455.0" y="143.0" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="normal" fill="#0f172a">將入場時間與參考時間統一設 tm_sec = 0，對齊至本地整分鐘</text>
+<path d="M 455,156 L 455,178" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="455,178.0 630.0,212 455,246.0 280.0,212" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="455" y="213.6" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="bold" fill="#78350f">歸一化成功 且 difftime(end, start) &gt;= 0 ?</text>
+<path d="M 630,212 L 685,212" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="648" y="202" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否</text>
+<rect x="685" y="184" width="205" height="56" rx="8" ry="8" fill="#fee2e2" stroke="#991b1b" stroke-width="1.8"/>
+<text x="787.5" y="197.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#0f172a">返回 false / kInvalidTime</text>
+<text x="787.5" y="213.25" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="normal" fill="#0f172a">(負時長或溢出: 保持調用方</text>
+<text x="787.5" y="228.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="normal" fill="#0f172a">輸出結構體與狀態不變)</text>
+<path d="M 455,246 L 455,270" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="463" y="260" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是</text>
+<rect x="175" y="270" width="560" height="48" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="287.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">計算總停留分鐘數並按連續 24 小時 (1440 分鐘) 週期拆分:</text>
+<text x="455.0" y="303.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">total_minutes = seconds / 60   |   days = total_minutes / 1440   |   remainder = total_minutes % 1440</text>
+<path d="M 455,318 L 455,340" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="175" y="340" width="560" height="48" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="455.0" y="357.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">計算顯示時長與剩餘部分向上取整計費小時數:</text>
+<text x="455.0" y="373.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">hours = remainder / 60,  minutes = remainder % 60   |   started_hours = (remainder + 59) / 60</text>
+<path d="M 455,388 L 455,410" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="175" y="410" width="560" height="52" rx="8" ry="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+<text x="455.0" y="421.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">應用單週期 400 MOP 封頂並匯總整數澳門元費用:</text>
+<text x="455.0" y="437.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">partial = min(400, started_hours * 20)   |   mop = days * 400 + partial</text>
+<text x="455.0" y="453.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">輸出格式: Duration: X days Y hours Z minutes | Fee: N MOP</text>
+</svg>
+<hr />
+<h3>3.4 本地文件載入、備份恢復與安全保存流程圖（Module Flowchart 3）</h3>
+<p><strong>邏輯說明（對應 <code>src/storage.cpp:29-177</code>）</strong>：</p>
+<ol>
+<li><strong>啟動載入與 <code>.bak</code> 自動恢復（<code>Storage::Load</code>）</strong>：<ul>
+<li>默認先將寫入鎖定標誌設為 <code>blocked_ = true</code>。</li>
+<li>若 <code>parking_data.txt</code> 與 <code>parking_data.txt.bak</code> 均不存在，初始化空車庫並解除鎖定（<code>blocked_ = false</code>），返回 <code>First run: no parking data file.</code>。</li>
+<li>若主文件存在則解析主文件；若主文件缺失但 <code>.bak</code> 存在，則解析 <code>.bak</code> 並將其重命名恢復為主文件（返回 <code>Recovered parking data from parking_data.txt.bak.</code>）。</li>
+<li><code>ParseFile()</code> 採用<strong>全有或全無（All-or-Nothing）</strong>策略：逐行解析 4 列 Tab 分隔字段並校驗時間戳與車牌唯一性；一旦某行格式錯誤或車牌重複，立即中止並返回精確行號（如 <code>Line 3: expected four tab-separated fields.</code>），原 <code>service</code> 保持不變且 <code>blocked_</code> 維持為 <code>true</code>，防止後續保存覆蓋損壞文件或備份。</li>
+</ul>
+</li>
+<li><strong>多步驟文件保存與回滾協議（Multi-step Save &amp; Rollback Protocol，<code>Storage::Save</code>）</strong>：<ul>
+<li>若 <code>blocked_ == true</code>，直接拒絕保存（<code>Save blocked: resolve the load or recovery error and reload first.</code>）。</li>
+<li>先在內存中對待保存的所有記錄做二次完整校驗，隨後寫入臨時文件 <code>parking_data.txt.tmp</code> 並檢查 <code>flush()</code> / <code>close()</code> 流狀態（寫入失敗則刪除 <code>.tmp</code> 並保留原文件）。</li>
+<li>若目標文件 <code>parking_data.txt</code> 已存在，先調用 <code>ParseFile()</code> 確認磁盤上的當前文件未被外部改壞（若已損壞則設 <code>blocked_ = true</code>、刪除 <code>.tmp</code> 並中止保存），再移除舊 <code>.bak</code> 並將原文件重命名備份為 <code>parking_data.txt.bak</code>；若目標文件不存在但檢測到殘留 <code>.bak</code>（或無法檢查 <code>.bak</code>），則設 <code>blocked_ = true</code> 並拒絕保存（<code>Backup exists or cannot be inspected; reload to recover before saving.</code>）。</li>
+<li>將 <code>.tmp</code> 重命名為 <code>parking_data.txt</code>：若替換失敗，自動嘗試將 <code>.bak</code> 重命名回滾為 <code>parking_data.txt</code>（若回滾也失敗則保留 <code>.bak</code> 並設 <code>blocked_ = true</code>，輸出 <code>Replacement and rollback failed; preserve backup ...</code>）；若替換成功，清理臨時 <code>.bak</code>（若清理 <code>.bak</code> 失敗則返回 <code>Saved; old backup could not be removed: ...</code>）並返回 <code>Parking data saved.</code>。</li>
+</ul>
+</li>
+</ol>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 535" style="width:100%; max-width:910px; height:auto; display:block; margin:8px auto; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="910" height="34" rx="8" ry="8" fill="#1e3a8a"/>
+  <text x="455.0" y="22" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff">圖 4：本地文件載入、備份恢復與安全保存流程圖 (Load, Recovery &amp; Safe Save Flowchart)</text>
+  <rect x="18" y="46" width="428" height="475" rx="8" ry="8" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="5,4"/>
+<text x="232" y="68" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.2" font-weight="bold" fill="#1e3a8a">A. 啟動載入與備份恢復 Storage::Load()</text>
+<rect x="36" y="80" width="392" height="42" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="232.0" y="94.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">1. 預設 blocked_ = true，檢查 parking_data.txt 與 .bak</text>
+<text x="232.0" y="110.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">若兩者均不存在 -&gt; 清空 service, blocked_=false (First run)</text>
+<path d="M 232,122 L 232,144" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="36" y="144" width="392" height="48" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="232.0" y="161.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">2. 調用 ParseFile() 解析主文件 (若主文件缺失則解析 .bak)</text>
+<text x="232.0" y="177.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">逐行檢查 4 列 Tab 分隔符、YYYY-MM-DD HH:MM 與車牌唯一性</text>
+<path d="M 232,192 L 232,214" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="232,215.0 347.0,244 232,273.0 117.0,244" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="232" y="245.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">全部行解析校驗通過?</text>
+<path d="M 232,273 L 232,298" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="240" y="289" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是</text>
+<rect x="36" y="298" width="392" height="52" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="232.0" y="317.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">3. 若主文件缺失: rename(.bak -&gt; parking_data.txt)</text>
+<text x="232.0" y="333.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">失敗則保留 .bak 並維持 blocked_=true; 成功則輸出 Recovered</text>
+<path d="M 232,350 L 232,374" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="36" y="374" width="392" height="42" rx="8" ry="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+<text x="232.0" y="388.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">4. 全量提交記錄至 service，設 blocked_ = false</text>
+<text x="232.0" y="404.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">返回 Loaded parking_data.txt. (或 Recovered ...)</text>
+<rect x="36" y="434" width="392" height="72" rx="8" ry="8" fill="#fee2e2" stroke="#991b1b" stroke-width="1.8"/>
+<text x="232.0" y="455.65" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="bold" fill="#0f172a">若任一行損壞或重複 (All-or-Nothing 失敗保護):</text>
+<text x="232.0" y="471.34999999999997" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 返回精確行號: Line N: expected four tab-separated fields. 等</text>
+<text x="232.0" y="487.04999999999995" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">• 原 service 保持不變，維持 blocked_ = true 阻止後續覆蓋</text>
+<path d="M 117,244 L 26,244 L 26,468 L 36,468" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="60" y="236" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否</text>
+<rect x="464" y="46" width="428" height="475" rx="8" ry="8" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="5,4"/>
+<text x="678" y="68" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="13.2" font-weight="bold" fill="#1e3a8a">B. 多步驟安全保存與失敗回滾協議 Storage::Save()</text>
+<rect x="482" y="80" width="392" height="42" rx="8" ry="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.8"/>
+<text x="678.0" y="94.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="bold" fill="#0f172a">1. 檢查 blocked_ 標誌: 若 blocked_ == true 立即拒絕保存</text>
+<text x="678.0" y="110.2" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.2" font-weight="normal" fill="#0f172a">(Save blocked: resolve the load or recovery error and reload first.)</text>
+<path d="M 678,122 L 678,144" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="482" y="144" width="392" height="48" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="678.0" y="161.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">2. 校驗內存快照並寫入臨時文件 parking_data.txt.tmp</text>
+<text x="678.0" y="177.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">寫入 # PARKING_SYSTEM_V1 與車牌升序 TSV 行，檢查 flush/close</text>
+<path d="M 678,192 L 678,214" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="482" y="214" width="392" height="54" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="678.0" y="226.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.0" font-weight="bold" fill="#0f172a">3. 替換前保護現有數據 (多步驟協議):</text>
+<text x="678.0" y="242.25" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.0" font-weight="normal" fill="#0f172a">• 主文件存在: ParseFile() 確認未損壞，刪舊 .bak 後 rename 為 .bak</text>
+<text x="678.0" y="257.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.0" font-weight="normal" fill="#0f172a">• 主文件不存在但有意外 .bak: 設 blocked_=true 並中止</text>
+<path d="M 678,268 L 678,290" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="482" y="290" width="392" height="40" rx="8" ry="8" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.8"/>
+<text x="678.0" y="311.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">4. 執行重命名替換: rename(.tmp -&gt; parking_data.txt)</text>
+<path d="M 678,330 L 678,352" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<polygon points="678,353.0 783.0,380 678,407.0 573.0,380" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="678" y="381.75" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#78350f">替換主文件成功?</text>
+<path d="M 678,407 L 678,434" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="686" y="423" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">是</text>
+<rect x="482" y="434" width="212" height="72" rx="8" ry="8" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+<text x="588.0" y="455.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">5a. 替換成功:</text>
+<text x="588.0" y="471.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">刪除臨時 .bak 備份</text>
+<text x="588.0" y="487.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="normal" fill="#0f172a">返回 Parking data saved.</text>
+<path d="M 783,380 L 804,380 L 804,434" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="790" y="372" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="11" font-weight="bold" fill="#1e293b">否</text>
+<rect x="704" y="434" width="170" height="72" rx="8" ry="8" fill="#fee2e2" stroke="#991b1b" stroke-width="1.8"/>
+<text x="789.0" y="448.2" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="10.8" font-weight="bold" fill="#0f172a">5b. 替換失敗回滾:</text>
+<text x="789.0" y="463.5" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="10.8" font-weight="normal" fill="#0f172a">將 .bak 恢復為主文件;</text>
+<text x="789.0" y="478.8" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="10.8" font-weight="normal" fill="#0f172a">若回滾也失敗則保留</text>
+<text x="789.0" y="494.1" text-anchor="middle" font-family="Microsoft JhengHei, Microsoft YaHei, sans-serif" font-size="10.8" font-weight="normal" fill="#0f172a">.bak 並設 blocked_=true</text>
+</svg>
+<hr />
+<h2>第四章 測試驗證結果與質量審計</h2>
+<p>系統配備了 4 套自動化測試程序（零外部測試框架依賴，純 C++17 標準庫與 PowerShell 腳本），並在 <code>JULI-9</code>（<code>Q01</code>）、<code>JULI-10</code>（<code>Q02</code>）、<code>JULI-11</code>（<code>D02</code>）與 <code>JULI-17</code>（Google C++ Style 整理及獨立復驗）中完成了獨立復現驗證：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">測試程序 / 腳本</th>
+  <th style="text-align:left">編譯與執行命令</th>
+  <th style="text-align:left">覆蓋範圍</th>
+  <th style="text-align:left">實際運行輸出與結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong>核心單元測試</strong> (<code>tests/test_main.cpp</code>)</td>
+  <td style="text-align:left"><code>g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_main.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/tests.exe</code> 並執行 <code>./build/tests.exe</code></td>
+  <td style="text-align:left">菜單無效輸入與 <code>EOF</code>、12 組計費邊界值（<code>0m</code> 至 <code>2881m</code>）、負時長拒絕、普通用戶越權攔截 (<code>kForbidden</code>)、字段空格/控制字符/閏年/未來時間校驗、車牌重複與改名衝突拒絕、數量統計與字典序排列。</td>
+  <td style="text-align:left"><code>All foundation, vehicle service and fee tests passed.</code>（退出碼 <code>0</code>，0 警告）</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>持久化與恢復測試</strong> (<code>tests/test_storage.cpp</code>)</td>
+  <td style="text-align:left"><code>g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_storage.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_storage.exe</code> 並執行 <code>./build/test_storage.exe</code></td>
+  <td style="text-align:left">首次運行空文件、UTF-8 中文品類/顏色增刪改落盤與重啟載入、<code>.bak</code> 中斷恢復、損壞行 (<code>Line 3</code>) 全有或全無攔截與保存鎖定、重複車牌攔截、損壞 <code>.bak</code> 保留與不可寫路徑處理。</td>
+  <td style="text-align:left"><code>All persistence and recovery tests passed.</code>（退出碼 <code>0</code>，0 警告）</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>菜單與保存失敗測試</strong> (<code>tests/test_menus.cpp</code>)</td>
+  <td style="text-align:left"><code>g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_menus.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_menus.exe</code> 並執行 <code>./build/test_menus.exe</code></td>
+  <td style="text-align:left">管理員增刪改查、切換普通用戶查詢時長與費用、普通用戶輸入 <code>4</code> 拒絕、重啟載入驗證，以及保存被鎖定時的 <code>Updated in memory, but save failed:</code> 警告驗證。</td>
+  <td style="text-align:left"><code>Menu workflow and save failure tests passed.</code>（退出碼 <code>0</code>，0 警告）</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>多進程端到端測試</strong> (<code>tests/test_e2e.ps1</code>)</td>
+  <td style="text-align:left"><code>./tests/test_e2e.ps1</code></td>
+  <td style="text-align:left">在隔離目錄下連續啟動 3 個獨立 <code>parking.exe</code> 進程，完整驗證空車庫、普通用戶權限攔截、管理員錄入、重複/改名衝突攔截、修改、普通用戶查詢費用/時長/總數、TSV 落盤內容、重啟載入、刪除與刪除後重啟驗證。</td>
+  <td style="text-align:left"><code>End-to-end multi-process workflow passed.</code>（退出碼 <code>0</code>）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>編譯與測試邊界披露</strong>：上述 4 套驗證及 <code>clang-format 23.1.1</code> / <code>cpplint 2.0.2</code> 規範檢查已在 Windows（<code>x86_64-w64-windows-gnu</code>, UCRT）本地時區實機通過；Linux/macOS POSIX 目標環境與夏令時（DST）跳變時刻未實機執行；底層 <code>.tmp</code> 寫入磁盤滿、OS 級重命名/回滾失敗與文件鎖/ACL 拒絕分支經靜態代碼對照驗證，未做動態故障注入。</p>
+</blockquote>
+<hr />
+<h2>第五章 系統局限性與可優化的邏輯及代碼討論</h2>
+<p>根據作業要求二（3）「討論系統內是否有可優化的邏輯及代碼部分」，本章節在不改動已凍結基線功能的前提下，從算法複雜度、I/O 性能、並發安全與工程擴展四個維度對當前系統進行客觀分析與優化探討：</p>
+<h3>5.1 現有設計的局限性分析</h3>
+<ol>
+<li><strong>每次修改全量重寫與預校驗的 <code>O(N)</code> I/O 開銷</strong>：<ul>
+<li>在 <code>src/storage.cpp:106-143</code> 中，<code>Storage::Save()</code> 每次保存時會先將內存中的全部記錄拷貝至臨時 <code>ParkingService checked</code> 進行二次校驗，並且當 <code>parking_data.txt</code> 已存在時，會先調用 <code>ParseFile(path_, current)</code> 讀取並校驗磁盤上的舊文件，隨後再將全部記錄寫入 <code>.tmp</code>。</li>
+<li><strong>局限性</strong>：對於酒店停車場日常百輛至千輛規模的在場車輛，全量讀寫耗時僅在毫秒級，且能提供極高的數據防損壞安全性；但若車庫規模擴展至十萬級以上，每次單車增刪改都觸發 <code>O(N log N)</code> 的全量解析與重寫，會產生明顯的磁盤 I/O 放大。</li>
+</ul>
+</li>
+<li><strong>多步驟文件重命名的非事務性（Non-Atomic Multi-Rename）</strong>：<ul>
+<li>在標準 C++17 <code>std::filesystem</code> 中，跨平台文件替換需依次執行 <code>rename(target, backup)</code> 與 <code>rename(temp, target)</code> 兩步操作。雖然系統設計了回滾與啟動時自動從 <code>.bak</code> 恢復的閉環機制，但它屬於「可恢復的多步協議（Recoverable Protocol）」，而非操作系統內核級的單步原子事務（如 POSIX 同目錄 <code>rename</code> 覆蓋或 Windows <code>ReplaceFileW</code> / NTFS TxF）。</li>
+</ul>
+</li>
+<li><strong>單進程獨佔模式與缺乏文件鎖（File Locking）</strong>：<ul>
+<li>系統假設同一時間僅有一個控制台進程讀寫同一份 <code>parking_data.txt</code>。若多個終端窗口同時啟動並併發修改同一文件，後保存的進程會覆蓋先保存進程的變更。</li>
+</ul>
+</li>
+<li><strong>本地時區與夏令時（DST）轉換邊界</strong>：<ul>
+<li>時間解析與分鐘歸一化依賴 C 標準庫 <code>std::localtime</code> 與 <code>std::mktime</code>（<code>tm_isdst = -1</code>）。在澳門（UTC+8，無夏令時）環境下完全精確且單調；但若部署在實行夏令時的地區，每年夏令時回撥的 1 小時重疊窗口內可能出現本地時間文本歧義。</li>
+</ul>
+</li>
+</ol>
+<h3>5.2 可優化的代碼與邏輯方向（未來演進建議）</h3>
+<ol>
+<li><strong>引入追加式預寫日誌（Append-Only WAL / Journal）與定期壓縮（Compaction）</strong>：<ul>
+<li><strong>優化方案</strong>：管理員執行單次 <code>add</code>、<code>modify</code>、<code>delete</code> 時，僅以 <code>O(1)</code> 時間向日誌文件追加一行增量操作記錄並 <code>flush</code>；僅在程序正常退出或日誌達到閾值時執行一次全量快照合併（Compaction）。這樣既保留了崩潰恢復能力，又將單次寫操作的磁盤 I/O 複雜度從 <code>O(N)</code> 降至 <code>O(1)</code>。</li>
+</ul>
+</li>
+<li><strong>消除保存路徑上的冗餘內存重構</strong>：<ul>
+<li><strong>優化方案</strong>：由於 <code>ParkingService</code> 的所有公開寫接口（<code>AddVehicle</code>、<code>ModifyVehicle</code>）在寫入 <code>records_</code> 前已經強制通過了 <code>Validated()</code> 校驗，內存中的 <code>VehicleRecord</code> 始終滿足不變量。因此 <code>Storage::Save()</code> 中的 <code>ParkingService checked</code> 二次插入（<code>src/storage.cpp:106-115</code>）可簡化為輕量級的字段斷言，將保存時的內存分配與紅黑樹插入開銷減少 50%。</li>
+</ul>
+</li>
+<li><strong>雙索引或哈希索引加速單車查找（<code>std::unordered_map</code> + 有序視圖）</strong>：<ul>
+<li><strong>優化方案</strong>：當前 <code>std::map</code> 查找為 <code>O(log N)</code>。若高頻執行單車牌精確查找（<code>FindByPlate</code> / <code>FindWithFee</code>），可增加 <code>std::unordered_map&lt;std::string, VehicleRecord&gt;</code> 實現 <code>O(1)</code> 平均查找，或僅在需要按車牌有序輸出時對指針數組排序。</li>
+</ul>
+</li>
+<li><strong>時間類型升級至 C++20 <code>std::chrono::utc_clock</code> / <code>sys_minutes</code></strong>：<ul>
+<li><strong>優化方案</strong>：若未來升級編譯標準至 C++20，可使用 <code>&lt;chrono&gt;</code> 日曆庫（<code>std::chrono::year_month_day</code> 與 <code>std::chrono::sys_minutes</code>）替代傳統 <code>std::tm</code> / <code>std::mktime</code>，實現無鎖、線程安全且與時區無關的日期算術。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>第六章 系統使用說明書（普通用戶與管理員操作指南）</h2>
+<p><em>(本章節完整納入經 <code>JULI-11</code> 實機交互核驗通過的使用說明書，供最終用戶與評審教師查閱。)</em></p>
+<h3>6.1 系統簡介與功能範圍</h3>
+<p>本系統包含三項必選模塊：</p>
+<ol>
+<li><strong>汽車信息模塊（1.1）</strong>：支持手動錄入車牌號（<code>Plate</code>）、汽車品類（<code>Category</code>）、汽車顏色（<code>Color</code>）及停車時間點（<code>Entry time</code>，格式 <code>YYYY-MM-DD HH:MM</code>）；支持按車牌號顯示、查找、修改和刪除車輛；支持統計停留時長（<code>X days Y hours Z minutes</code>）與在場車輛總數（<code>Current count</code>）；支持本地文件 <code>parking_data.txt</code> 自動保存與重啟載入。</li>
+<li><strong>普通用戶模塊（1.2）</strong>：支持顯示所有車輛與費用（<code>1 = list</code>）、按車牌查詢單車與費用（<code>2 = find</code>）、統計在場車輛總數（<code>3 = count</code>）及退出普通用戶登錄（<code>0 = logout</code>）。普通用戶無權執行任何增刪改操作。</li>
+<li><strong>管理員用戶模塊（1.3）</strong>：具備普通用戶所有查詢統計功能（<code>1–3</code>），並支持添加（<code>4 = add</code>）、修改（<code>5 = modify</code>）、刪除（<code>6 = delete</code>）及退出登錄（<code>0 = logout</code>）。</li>
+</ol>
+<blockquote>
+<p><strong>範圍說明</strong>：本系統採用手動輸入車牌號方案，不包含可選的 OpenCV 圖像識別、GUI、外部數據庫、密碼註冊系統、車位上限攔截或歷史離場記錄表。</p>
+</blockquote>
+<h3>6.2 環境要求、編譯與啟動步驟</h3>
+<ol>
+<li><strong>前置環境</strong>：支持 C++17 的編譯器（如 <code>g++</code> 或 <code>clang++</code>）。在 Windows PowerShell 下交互輸入或查看中文品類/顏色前，建議先設置 UTF-8 編碼：<pre><code class="language-powershell">[Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+</code></pre>
+</li>
+<li><strong>編譯與啟動主程序</strong>：<pre><code class="language-powershell">New-Item -ItemType Directory -Force build
+g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc src/*.cpp -o build/parking.exe
+./build/parking.exe
+</code></pre>
+</li>
+<li><strong>啟動載入提示與頂層角色選擇菜單</strong>：<ul>
+<li>首次運行顯示：<code>First run: no parking data file.</code></li>
+<li>已有數據文件顯示：<code>Loaded parking_data.txt.</code></li>
+<li>從備份恢復顯示：<code>Recovered parking data from parking_data.txt.bak.</code></li>
+<li>隨後顯示收費規則與頂層菜單：<pre><code class="language-text">Fee: 20 MOP per started hour, capped at 400 MOP per successive 24-hour block.
+Parking system: 1 = ordinary, 2 = administrator, 0 = exit
+&gt; 
+</code></pre>
+</li>
+<li>輸入 <code>1</code> 進入普通用戶會話，輸入 <code>2</code> 進入管理員會話，輸入 <code>0</code> 保存並退出程序（輸出 <code>Parking data saved.</code>）。</li>
+</ul>
+</li>
+</ol>
+<h3>6.3 普通用戶操作步驟（<code>1 = ordinary</code>）</h3>
+<p>進入普通用戶會話後，菜單提示如下：</p>
+<pre><code class="language-text">Ordinary user session: 1 = list, 2 = find, 3 = count, 0 = logout
+&gt; 
+</code></pre>
+<ul>
+<li><strong><code>1</code>（顯示全部車輛、時長與費用）</strong>：<ul>
+<li>車庫為空時輸出 <code>No vehicles.</code> 與 <code>Current count: 0</code>。</li>
+<li>車庫有車時按車牌字典序升序逐行輸出：<pre><code class="language-text">Plate: MA-12-34 | Category: 轎車 | Color: 銀色 | Entry: 2026-11-01 08:00 | Duration: 0 days 21 hours 40 minutes | Fee: 400 MOP
+Plate: MB-56-78 | Category: SUV | Color: 白色 | Entry: 2026-11-02 04:00 | Duration: 0 days 1 hours 40 minutes | Fee: 40 MOP
+Current count: 2
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><code>2</code>（按車牌查詢單車資訊與費用）</strong>：在 <code>Plate: </code> 提示後輸入車牌號。若存在則輸出該車完整資訊；若不存在則輸出 <code>Vehicle not found.</code>；若輸入格式非法則輸出 <code>Unable to retrieve vehicle or calculate duration.</code>；無論命中或未命中，最後均會附帶輸出一行 <code>Current count: N</code>。</li>
+<li><strong><code>3</code>（統計當前在場車輛總數）</strong>：輸出 <code>Current count: N</code>。</li>
+<li><strong><code>0</code>（退出普通用戶登錄）</strong>：返回頂層菜單 <code>Parking system: 1 = ordinary, 2 = administrator, 0 = exit</code>。若輸入 <code>4</code>、<code>5</code>、<code>6</code> 等非授權選項，系統拒絕並輸出 <code>Invalid choice.</code>。</li>
+</ul>
+<h3>6.4 管理員操作步驟（<code>2 = administrator</code>）</h3>
+<p>進入管理員會話後，菜單提示如下：</p>
+<pre><code class="language-text">Administrator session: 1 = list, 2 = find, 3 = count, 4 = add, 5 = modify, 6 = delete, 0 = logout
+&gt; 
+</code></pre>
+<ul>
+<li><strong><code>1</code>、<code>2</code>、<code>3</code>（共享查詢與統計）</strong>：與普通用戶功能完全相同。</li>
+<li><strong><code>4</code>（添加車輛）</strong>：依次按提示輸入 <code>Plate: </code>、<code>Category: </code>、<code>Color: </code>、<code>Entry time (YYYY-MM-DD HH:MM): </code>。驗證通過並保存成功後輸出：<pre><code class="language-text">Updated and saved. Parking data saved.
+</code></pre>
+</li>
+<li><strong><code>5</code>（修改車輛）</strong>：先在 <code>Existing plate: </code> 輸入場內現存車牌，再依次輸入修改後的 <code>Plate</code>、<code>Category</code>、<code>Color</code>、<code>Entry time (YYYY-MM-DD HH:MM)</code>。成功後輸出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong><code>6</code>（刪除車輛）</strong>：在 <code>Existing plate: </code> 輸入待刪除車牌，成功後輸出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong><code>0</code>（退出管理員登錄）</strong>：返回頂層角色選擇菜單。</li>
+</ul>
+<h3>6.5 停車費計算規則與邊界對照表</h3>
+<p>系統將入場時間與當前查詢時間統一歸一化至本地整分鐘（<code>tm_sec = 0</code>），按以下規則計算整數澳門元（<code>MOP</code>）費用：</p>
+<ul>
+<li><strong>0 分鐘停留</strong>：<code>0 MOP</code>。</li>
+<li><strong>分段封頂計費</strong>：每滿一個連續 24 小時（1440 分鐘）週期收費 <code>400 MOP</code>；剩餘不滿 24 小時的部分按「每開始 1 小時（向上取整）收費 20 MOP、最高封頂 400 MOP」計算。</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">停留總時長</th>
+  <th style="text-align:left">終端顯示時長 (<code>Duration</code>)</th>
+  <th style="text-align:left">應收費用 (<code>Fee</code>)</th>
+  <th style="text-align:left">規則說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><code>0</code> 分鐘</td>
+  <td style="text-align:left"><code>0 days 0 hours 0 minutes</code></td>
+  <td style="text-align:left"><code>0 MOP</code></td>
+  <td style="text-align:left">同一分鐘內查詢免費</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>1</code> 分鐘</td>
+  <td style="text-align:left"><code>0 days 0 hours 1 minutes</code></td>
+  <td style="text-align:left"><code>20 MOP</code></td>
+  <td style="text-align:left">不足 1 小時按 1 小時計算</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>60</code> 分鐘</td>
+  <td style="text-align:left"><code>0 days 1 hours 0 minutes</code></td>
+  <td style="text-align:left"><code>20 MOP</code></td>
+  <td style="text-align:left">整 1 小時</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>61</code> 分鐘</td>
+  <td style="text-align:left"><code>0 days 1 hours 1 minutes</code></td>
+  <td style="text-align:left"><code>40 MOP</code></td>
+  <td style="text-align:left">進入第 2 個計費小時</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>20</code> 小時 (<code>1200m</code>)</td>
+  <td style="text-align:left"><code>0 days 20 hours 0 minutes</code></td>
+  <td style="text-align:left"><code>400 MOP</code></td>
+  <td style="text-align:left">達到單個 24 小時週期 400 MOP 封頂</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>24</code> 小時 (<code>1440m</code>)</td>
+  <td style="text-align:left"><code>1 days 0 hours 0 minutes</code></td>
+  <td style="text-align:left"><code>400 MOP</code></td>
+  <td style="text-align:left">1 個完整 24 小時週期</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>24</code> 小時 <code>1</code> 分鐘 (<code>1441m</code>)</td>
+  <td style="text-align:left"><code>1 days 0 hours 1 minutes</code></td>
+  <td style="text-align:left"><code>420 MOP</code></td>
+  <td style="text-align:left">首日 400 MOP + 次日第 1 小時 20 MOP</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>48</code> 小時 (<code>2880m</code>)</td>
+  <td style="text-align:left"><code>2 days 0 hours 0 minutes</code></td>
+  <td style="text-align:left"><code>800 MOP</code></td>
+  <td style="text-align:left">2 個完整 24 小時週期</td>
+</tr>
+</tbody>
+</table>
+<h3>6.6 字段校驗、本地文件格式與異常恢復速查表</h3>
+<ul>
+<li><strong>本地數據文件</strong>：默認位於當前工作目錄下的 <code>parking_data.txt</code>（UTF-8 編碼，首行為 <code># PARKING_SYSTEM_V1</code>，每行 4 個以 Tab <code>\t</code> 分隔的字段：<code>車牌\t品類\t顏色\tYYYY-MM-DD HH:MM</code>）。</li>
+<li><strong>常見提示與故障恢復對照表</strong>：</li>
+</ul>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">終端精確英文提示</th>
+  <th style="text-align:left">觸發原因與恢復操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><code>Invalid choice.</code></td>
+  <td style="text-align:left">輸入了無效菜單編號；請按菜單提示重新輸入有效數字。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Invalid required field.</code></td>
+  <td style="text-align:left">車牌/品類/顏色為空、車牌含內部空格（如 <code>MA 12</code>）或含控制字符；請修正後重試。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Invalid entry time.</code></td>
+  <td style="text-align:left">時間不符合 16 位 <code>YYYY-MM-DD HH:MM</code> 格式或日曆日期不存在（如平年 <code>2026-02-29</code>）；請按正確格式重輸。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Entry time is in the future.</code></td>
+  <td style="text-align:left">入場時間晚於當前系統時間；請輸入過去或當前的時間點。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Plate already exists.</code></td>
+  <td style="text-align:left">添加了重複車牌，或修改車牌時目標新車牌已被佔用；請使用唯一車牌。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Vehicle not found.</code></td>
+  <td style="text-align:left">查詢、修改或刪除的目標車牌不存在；可先輸入 <code>1</code> 查看全部在場車牌。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Updated in memory, but save failed: &lt;reason&gt;</code></td>
+  <td style="text-align:left"><strong>僅內存更新警告</strong>：管理員修改已在當前會話內存生效，但寫入磁盤失敗（如 <code>.tmp</code> 權限不足或目錄衝突）。請根據 <code>&lt;reason&gt;</code> 排除磁盤權限/文件衝突後再次執行保存或正常退出。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Line N: expected four tab-separated fields.</code> / <code>invalid timestamp.</code> / <code>duplicate plate.</code></td>
+  <td style="text-align:left">啟動時發現 <code>parking_data.txt</code> 第 <code>N</code> 行被外部破壞。系統拒絕半載入並鎖定保存（退出碼 <code>1</code>）；請用文本編輯器修復第 <code>N</code> 行後重啟程序。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Save blocked: resolve the load or recovery error and reload first.</code></td>
+  <td style="text-align:left">因載入失敗、備份恢復失敗或保存前發現磁盤文件被外部改壞而觸發安全鎖定；請先檢查並保留 <code>parking_data.txt</code> 與 <code>parking_data.txt.bak</code>，修復後重啟程序。</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

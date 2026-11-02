@@ -80,4 +80,3 @@ uvx --from cpplint==2.0.2 cpplint --recursive src tests
 - **Verified testing limits**:
   - Clean C++17 compilation (`0` warnings) and the four verification suites (`build/tests.exe`, `build/test_storage.exe`, `build/test_menus.exe`, and `tests/test_e2e.ps1`) were verified on Windows (`x86_64-w64-windows-gnu`, UCRT) in the local timezone; POSIX (Linux/macOS) builds and daylight-saving-time (DST) transition edges were not executed on target hardware.
   - Persistence tests dynamically cover missing files on first run, `.bak` startup recovery, malformed lines, duplicate plates, invalid `.bak` preservation, and parent paths blocked by a regular file (`blocker / "data.txt"`). Mid-write stream/disk-full failures on `.tmp`, OS-level rename/rollback failures (`path_ -> .bak`, `.tmp -> path_`, `.bak -> path_`), and ACL/file-lock errors were verified by static comparison against the baseline rather than dynamic fault injection.
-

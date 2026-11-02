@@ -1,6 +1,8 @@
 $ErrorActionPreference = 'Stop'
-$exe = (Resolve-Path 'build/parking.exe').Path
-$testDir = Join-Path (Resolve-Path 'build').Path ('e2e-' + [guid]::NewGuid().ToString('N'))
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$buildDir = Join-Path $repoRoot 'build'
+$exe = (Resolve-Path (Join-Path $buildDir 'parking.exe')).Path
+$testDir = Join-Path $buildDir ('e2e-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $testDir | Out-Null
 function Run-App([string[]]$lines) {
     $result = $lines | & $exe

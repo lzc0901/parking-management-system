@@ -1,5 +1,7 @@
 # 酒店停車場管理系統（Hotel Parking Management System）完整功能演示腳本與錄製核對清單（修訂版 v2）
 
+> 目錄更新：本文件位於 `docs/`；歷史視頻和時間戳位於本地 `docs/demo/`，舊 ZIP 位於 `dist/archive/`。這些歷史材料不隨當前交付包發布。命令從項目根目錄執行。
+
 **項目名稱**：高級程式設計與軟件工程期末專題 — 酒店停車場管理系統（Hotel Parking Management System）  
 **對應議題**：[JULI-13](mention://issue/01a1980f-6878-713b-9e89-a8be7590f771)（D03: Prepare and rehearse the complete demonstration script）  
 **下游錄製議題**：[JULI-14](mention://issue/01a1980f-6fa0-7a86-8493-7c59850c53b5)（D04: Capture and verify the required full-process screen recording）  

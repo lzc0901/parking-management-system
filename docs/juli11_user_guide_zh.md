@@ -60,13 +60,15 @@ g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc src/*.cpp -o build/parking.exe
 如需運行系統自帶的單元測試、持久化恢復測試、菜單交互測試與多進程端到端測試，可在項目根目錄執行：
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_main.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/tests.exe
-g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_storage.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_storage.exe
-g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_menus.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_menus.exe
-./build/tests.exe
-./build/test_storage.exe
-./build/test_menus.exe
-./tests/test_e2e.ps1
+New-Item -ItemType Directory -Force build | Out-Null
+$sources = Get-ChildItem src/*.cpp | Where-Object Name -ne 'main.cpp'
+Get-ChildItem tests/unit/*.cpp, tests/integration/*.cpp | ForEach-Object {
+    g++ -std=c++17 -Wall -Wextra -pedantic -I. $_.FullName $sources.FullName -o "build/$($_.BaseName).exe"
+    if ($LASTEXITCODE -ne 0) { throw "Compilation failed: $($_.Name)" }
+    & "./build/$($_.BaseName).exe"
+    if ($LASTEXITCODE -ne 0) { throw "Test failed: $($_.Name)" }
+}
+./tests/e2e/test_e2e.ps1
 ```
 
 ---

@@ -1,5 +1,7 @@
 # 酒店停車場管理系統 — 系統開發報告與使用說明書
 
+> 目錄更新：本報告位於 `docs/`，流程圖位於 `docs/diagrams/`。所有編譯命令均從項目根目錄執行；最終包位於 `dist/`，歷史資料不屬於當前交付內容。
+
 **課程名稱**：高級編程與軟件工程（期末項目）  
 **項目名稱**：澳門本地酒店停車場管理系統（C++17 控制台與本地持久化實現）  
 **開發團隊**：Parking Management Development Team  
@@ -10,7 +12,7 @@
 ## 第一章 項目背景與需求分析
 
 ### 1.1 項目背景與作業要求
-根據《高級編程與軟件工程期末項目》任務書（`高級編程期末項目(1)(1).pdf`），澳門本地某酒店需開發一套停車場管理系統，包含**汽車信息模塊（1.1）**、**普通用戶模塊（1.2）**和**管理員用戶模塊（1.3）**三項基本功能模塊，建議分開建立文件進行編程，並提交：
+根據《高級編程與軟件工程期末項目》任務書（`docs/references/高級編程期末項目(1)(1).pdf`（本地參考材料，不隨交付包發布）），澳門本地某酒店需開發一套停車場管理系統，包含**汽車信息模塊（1.1）**、**普通用戶模塊（1.2）**和**管理員用戶模塊（1.3）**三項基本功能模塊，建議分開建立文件進行編程，並提交：
 1. **源代碼文件（50%）**：對程序語句或模塊進行合理注釋或解釋，基於 **C++17** 編譯並運行無報錯。
 2. **全流程演示錄屏（10%）**：使用普通用戶及管理員用戶進行汽車信息錄入、查詢與刪減等全流程演示並錄屏（覆蓋 3 個基本模塊的所有功能）。
 3. **系統開發報告與使用說明 PDF（40%）**：梳理開發邏輯，畫出系統整體及部分的簡單流程圖並進行說明，討論系統內可優化的邏輯及代碼部分，並附完整使用說明書。
@@ -19,15 +21,15 @@
 
 | 編號 | 課程作業需求描述 | 實現模組與源代碼定位 | 驗證狀態與證據 |
 | :--- | :--- | :--- | :--- |
-| **M01** | **添加汽車信息**：錄入車牌號、汽車品類（轎車、SUV 等）、汽車顏色、停車時間點（採用手動輸入車牌號方案，排除可選 OpenCV 識別）。 | `src/vehicle.h/.cpp`、`src/parking_service.h/.cpp` (`AddVehicle`)、`src/admin_user.cpp` (`ReadRecord`) | 已通過單元測試 (`tests/test_main.cpp`) 與多進程端到端測試 (`tests/test_e2e.ps1`)。 |
-| **M02** | **顯示、刪除、查找、修改汽車資訊**：輸入停車場中存在的車牌號，對汽車資訊進行顯示、查找、修改、刪除操作。 | `src/parking_service.h/.cpp` (`ListWithFees`, `FindWithFee`, `ModifyVehicle`, `DeleteVehicle`)、`src/menus.cpp` | 已通過 CRUD、改名衝突拒絕與空車庫保護測試 (`tests/test_main.cpp`, `tests/test_menus.cpp`)。 |
-| **M03** | **停車時長統計**：顯示汽車在停車場中停留的時間（`X days Y hours Z minutes`）和當前在場車輛總數（`Current count`）。 | `src/fee_calculator.h/.cpp` (`CalculateParkingFee`)、`src/parking_service.h` (`Count()`) | 已通過 12 組邊界時長與數量不變量測試 (`tests/test_main.cpp`)。 |
-| **M04** | **汽車資訊保存**：將汽車資訊保存到本地檔 `parking_data.txt` 中，並支持跨進程重啟載入與 `.bak` 故障恢復。 | `src/storage.h/.cpp` (`Storage::Load`, `Storage::Save`)、`src/main.cpp` | 已通過持久化與異常恢復專項測試 (`tests/test_storage.cpp`) 及 3 進程重啟測試 (`tests/test_e2e.ps1`)。 |
-| **M05** | **普通用戶模塊（1.2）**：查詢、顯示所有汽車資訊及停車費資訊（每小時 20 MOP，每連續 24 小時封頂 400 MOP），停車時長統計，退出普通用戶登錄。 | `src/ordinary_user.h/.cpp` (`RunOrdinaryUserSession`)、`src/menus.cpp` (`RunReadChoice`) | 已通過普通用戶只讀會話、費用顯示與登出測試 (`tests/test_menus.cpp`, `tests/test_e2e.ps1`)。 |
+| **M01** | **添加汽車信息**：錄入車牌號、汽車品類（轎車、SUV 等）、汽車顏色、停車時間點（採用手動輸入車牌號方案，排除可選 OpenCV 識別）。 | `src/vehicle.h/.cpp`、`src/parking_service.h/.cpp` (`AddVehicle`)、`src/admin_user.cpp` (`ReadRecord`) | 已通過業務集成測試 (`tests/integration/test_parking_service.cpp`) 與多進程端到端測試 (`tests/e2e/test_e2e.ps1`)。 |
+| **M02** | **顯示、刪除、查找、修改汽車資訊**：輸入停車場中存在的車牌號，對汽車資訊進行顯示、查找、修改、刪除操作。 | `src/parking_service.h/.cpp` (`ListWithFees`, `FindWithFee`, `ModifyVehicle`, `DeleteVehicle`)、`src/menus.cpp` | 已通過 CRUD、改名衝突拒絕與空車庫保護測試 (`tests/integration/test_parking_service.cpp`, `tests/integration/test_menus.cpp`)。 |
+| **M03** | **停車時長統計**：顯示汽車在停車場中停留的時間（`X days Y hours Z minutes`）和當前在場車輛總數（`Current count`）。 | `src/fee_calculator.h/.cpp` (`CalculateParkingFee`)、`src/parking_service.h` (`Count()`) | 已通過 12 組計費邊界測試 (`tests/unit/test_fee_calculator.cpp`) 與業務數量不變量測試。 |
+| **M04** | **汽車資訊保存**：將汽車資訊保存到本地檔 `parking_data.txt` 中，並支持跨進程重啟載入與 `.bak` 故障恢復。 | `src/storage.h/.cpp` (`Storage::Load`, `Storage::Save`)、`src/main.cpp` | 已通過持久化與異常恢復專項測試 (`tests/integration/test_storage.cpp`) 及 3 進程重啟測試 (`tests/e2e/test_e2e.ps1`)。 |
+| **M05** | **普通用戶模塊（1.2）**：查詢、顯示所有汽車資訊及停車費資訊（每小時 20 MOP，每連續 24 小時封頂 400 MOP），停車時長統計，退出普通用戶登錄。 | `src/ordinary_user.h/.cpp` (`RunOrdinaryUserSession`)、`src/menus.cpp` (`RunReadChoice`) | 已通過普通用戶只讀會話、費用顯示與登出測試 (`tests/integration/test_menus.cpp`, `tests/e2e/test_e2e.ps1`)。 |
 | **M06** | **管理員用戶模塊（1.3）**：具備普通用戶模塊的所有功能，並具有增（`4`）、改（`5`）、刪（`6`）功能及即時保存。 | `src/admin_user.h/.cpp` (`RunAdminUserSession`)、`src/parking_service.cpp` (`Role::kAdmin` 校驗) | 已通過服務層權限攔截 (`Role::kOrdinaryUser` 返回 `kForbidden`) 與管理員全流程測試。 |
-| **M07** | **分文件編程、代碼注釋與無報錯運行（50%）**：C++17 標準庫實現，3 大模塊分文件組織，遵循 Google C++ Style（含已批准 `<filesystem>` 項目級例外），開啟 `-Wall -Wextra -pedantic` 零警告零報錯。 | `src/*.h`、`src/*.cpp`（共 15 個源文件）、`tests/*`（4 個測試文件） | `g++ -std=c++17 -Wall -Wextra -pedantic -I.` 零警告編譯通過，4 套測試全部 `PASS`。 |
+| **M07** | **分文件編程、代碼注釋與無報錯運行（50%）**：C++17 標準庫實現，3 大模塊分文件組織，遵循 Google C++ Style（含已批准 `<filesystem>` 項目級例外），開啟 `-Wall -Wextra -pedantic` 零警告零報錯。 | `src/*.h`、`src/*.cpp`（共 15 個源文件）、`tests/unit/`、`tests/integration/`、`tests/e2e/`（7 個測試文件） | `g++ -std=c++17 -Wall -Wextra -pedantic -I.` 零警告編譯通過，7 套測試全部 `PASS`。 |
 | **M08** | **全流程演示錄屏（10%）**：覆蓋普通用戶與管理員全部功能的實際終端錄屏。 | 演示腳本與檢查表（`JULI-13`）、實機錄屏（`JULI-14`） | 由獨立演示腳本與實機錄製覆蓋全部必選功能。 |
-| **M09** | **系統開發報告與使用說明 PDF（40%）**：含開發邏輯、整體與部分流程圖、優化討論及使用說明書。 | 本報告（`juli12_development_report_zh.md` / `.pdf`）及流程圖源碼（`juli12_flowcharts.mmd`、`juli12_flowchart_1_overall.svg` 至 `juli12_flowchart_4_storage.svg`） | 全部頁面經渲染與逐頁視覺檢查確認排版清晰、圖表完整，Markdown 相對 SVG 引用通過自動檢查。 |
+| **M09** | **系統開發報告與使用說明 PDF（40%）**：含開發邏輯、整體與部分流程圖、優化討論及使用說明書。 | 本報告（`juli12_development_report_zh.md` / `.pdf`）及流程圖源碼（`diagrams/juli12_flowcharts.mmd`、`juli12_flowchart_1_overall.svg` 至 `juli12_flowchart_4_storage.svg`） | 全部頁面經渲染與逐頁視覺檢查確認排版清晰、圖表完整，Markdown 相對 SVG 引用通過自動檢查。 |
 | **M10** | **小組提交規範**：由指定小組成員在截止日前將最新代碼、錄屏與 PDF 上傳至暢課（Changke）。 | 最終提交包審計（`JULI-15`、`JULI-16`、`JULI-18`） | 保持代碼、測試、報告與錄屏版本一致，待人工最終確認後上傳。 |
 
 ### 1.3 已批准的設計決策與範圍邊界
@@ -93,7 +95,7 @@
 3. 普通用戶會話僅能執行 `1 = list`、`2 = find`、`3 = count` 與 `0 = logout`；管理員會話除上述三項外還可執行 `4 = add`、`5 = modify`、`6 = delete`，且每次寫操作成功後立即觸發 `storage.Save(service)`。
 4. 頂層菜單退出時，主函數再次調用 `storage.Save(service)` 確認落盤並根據保存結果返回退出碼 `0` 或 `1`。
 
-![圖 1：系統整體運行與角色會話路由流程圖](./juli12_flowchart_1_overall.svg)
+![圖 1：系統整體運行與角色會話路由流程圖](./diagrams/juli12_flowchart_1_overall.svg)
 
 ---
 
@@ -109,7 +111,7 @@
 4. 檢查車牌存在性與唯一性：添加時若車牌已存在，或修改車牌名稱時新車牌與其他在場車輛衝突，均返回 `kDuplicatePlate`，且**保持原內存數據不變**。
 5. 內存更新成功後，立即調用 `storage.Save(service)`：若保存成功則輸出 `Updated and saved. Parking data saved.`；若磁盤保存失敗，輸出警告 `Updated in memory, but save failed: <reason>`，明確告知用戶變更僅在內存生效而未落盤。
 
-![圖 2：管理員增刪改（CRUD）與即時持久化流程圖](./juli12_flowchart_2_crud.svg)
+![圖 2：管理員增刪改（CRUD）與即時持久化流程圖](./diagrams/juli12_flowchart_2_crud.svg)
 
 ---
 
@@ -125,7 +127,7 @@
    - 剩餘部分向上取整計費小時數：`started_hours = (remainder + 59) / 60`，部分費用 `partial = min(400, started_hours * 20)`。
    - 總費用：`mop = days * 400 + partial`。
 
-![圖 3：確定性停車時長與費用計算流程圖](./juli12_flowchart_3_fee.svg)
+![圖 3：確定性停車時長與費用計算流程圖](./diagrams/juli12_flowchart_3_fee.svg)
 
 ---
 
@@ -143,22 +145,41 @@
    - 若目標文件 `parking_data.txt` 已存在，先調用 `ParseFile()` 確認磁盤上的當前文件未被外部改壞（若已損壞則設 `blocked_ = true`、刪除 `.tmp` 並中止保存），再移除舊 `.bak` 並將原文件重命名備份為 `parking_data.txt.bak`；若目標文件不存在但檢測到殘留 `.bak`（或無法檢查 `.bak`），則設 `blocked_ = true` 並拒絕保存（`Backup exists or cannot be inspected; reload to recover before saving.`）。
    - 將 `.tmp` 重命名為 `parking_data.txt`：若替換失敗，自動嘗試將 `.bak` 重命名回滾為 `parking_data.txt`（若回滾也失敗則保留 `.bak` 並設 `blocked_ = true`，輸出 `Replacement and rollback failed; preserve backup ...`）；若替換成功，清理臨時 `.bak`（若清理 `.bak` 失敗則返回 `Saved; old backup could not be removed: ...`）並返回 `Parking data saved.`。
 
-![圖 4：本地文件載入、備份恢復與安全保存流程圖](./juli12_flowchart_4_storage.svg)
+![圖 4：本地文件載入、備份恢復與安全保存流程圖](./diagrams/juli12_flowchart_4_storage.svg)
 
 ---
 
 ## 第四章 測試驗證結果與質量審計
 
-系統配備了 4 套自動化測試程序（零外部測試框架依賴，純 C++17 標準庫與 PowerShell 腳本），並在 `JULI-9`（`Q01`）、`JULI-10`（`Q02`）、`JULI-11`（`D02`）與 `JULI-17`（Google C++ Style 整理及獨立復驗）中完成了獨立復現驗證：
+系統現按層次組織為 3 個單元測試、3 個集成測試與 1 個端到端腳本，無外部測試框架依賴。原 `JULI-9` 至 `JULI-17` 的四套驗證屬歷史記錄；本次結構調整保留原有斷言，並增加直接的字段與時間函數測試。產品 `src/` 不作修改。
 
-| 測試程序 / 腳本 | 編譯與執行命令 | 覆蓋範圍 | 實際運行輸出與結果 |
-| :--- | :--- | :--- | :--- |
-| **核心單元測試** (`tests/test_main.cpp`) | `g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_main.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/tests.exe` 並執行 `./build/tests.exe` | 菜單無效輸入與 `EOF`、12 組計費邊界值（`0m` 至 `2881m`）、負時長拒絕、普通用戶越權攔截 (`kForbidden`)、字段空格/控制字符/閏年/未來時間校驗、車牌重複與改名衝突拒絕、數量統計與字典序排列。 | `All foundation, vehicle service and fee tests passed.`（退出碼 `0`，0 警告） |
-| **持久化與恢復測試** (`tests/test_storage.cpp`) | `g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_storage.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_storage.exe` 並執行 `./build/test_storage.exe` | 首次運行空文件、UTF-8 中文品類/顏色增刪改落盤與重啟載入、`.bak` 中斷恢復、損壞行 (`Line 3`) 全有或全無攔截與保存鎖定、重複車牌攔截、損壞 `.bak` 保留與不可寫路徑處理。 | `All persistence and recovery tests passed.`（退出碼 `0`，0 警告） |
-| **菜單與保存失敗測試** (`tests/test_menus.cpp`) | `g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc tests/test_menus.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_menus.exe` 並執行 `./build/test_menus.exe` | 管理員增刪改查、切換普通用戶查詢時長與費用、普通用戶輸入 `4` 拒絕、重啟載入驗證，以及保存被鎖定時的 `Updated in memory, but save failed:` 警告驗證。 | `Menu workflow and save failure tests passed.`（退出碼 `0`，0 警告） |
-| **多進程端到端測試** (`tests/test_e2e.ps1`) | `./tests/test_e2e.ps1` | 在隔離目錄下連續啟動 3 個獨立 `parking.exe` 進程，完整驗證空車庫、普通用戶權限攔截、管理員錄入、重複/改名衝突攔截、修改、普通用戶查詢費用/時長/總數、TSV 落盤內容、重啟載入、刪除與刪除後重啟驗證。 | `End-to-end multi-process workflow passed.`（退出碼 `0`） |
+| 分類 | 測試文件 | 覆蓋範圍 |
+| :--- | :--- | :--- |
+| 單元 | `tests/unit/test_vehicle.cpp` | 車輛記錄、字段空格、控制字符與車牌校驗 |
+| 單元 | `tests/unit/test_time.cpp` | 合法閏日、非法日期、格式拒絕、分鐘歸一化與失敗輸出保留 |
+| 單元 | `tests/unit/test_fee_calculator.cpp` | 12 組計費與時長邊界、負時長拒絕 |
+| 集成 | `tests/integration/test_parking_service.cpp` | 權限、CRUD、排序、重複與改名衝突、費用查詢 |
+| 集成 | `tests/integration/test_storage.cpp` | UTF-8 落盤、重啟、備份恢復、損壞行與保存鎖定 |
+| 集成 | `tests/integration/test_menus.cpp` | 非法輸入、EOF、角色切換、操作保存與保存失敗提示 |
+| 端到端 | `tests/e2e/test_e2e.ps1` | 三個獨立進程、文件內容與刪除後重啟 |
 
-> **編譯與測試邊界披露**：上述 4 套驗證及 `clang-format 23.1.1` / `cpplint 2.0.2` 規範檢查已在 Windows（`x86_64-w64-windows-gnu`, UCRT）本地時區實機通過；Linux/macOS POSIX 目標環境與夏令時（DST）跳變時刻未實機執行；底層 `.tmp` 寫入磁盤滿、OS 級重命名/回滾失敗與文件鎖/ACL 拒絕分支經靜態代碼對照驗證，未做動態故障注入。
+從項目根目錄執行以下命令；先按第二章構建 `build/parking.exe`：
+
+```powershell
+New-Item -ItemType Directory -Force build | Out-Null
+$sources = Get-ChildItem src/*.cpp | Where-Object Name -ne 'main.cpp'
+Get-ChildItem tests/unit/*.cpp, tests/integration/*.cpp | ForEach-Object {
+    g++ -std=c++17 -Wall -Wextra -pedantic -I. $_.FullName $sources.FullName -o "build/$($_.BaseName).exe"
+    if ($LASTEXITCODE -ne 0) { throw "Compilation failed: $($_.Name)" }
+    & "./build/$($_.BaseName).exe"
+    if ($LASTEXITCODE -ne 0) { throw "Test failed: $($_.Name)" }
+}
+./tests/e2e/test_e2e.ps1
+```
+
+成功標準：六個 C++ 測試均退出 `0`，端到端腳本輸出 `End-to-end multi-process workflow passed.`。本次在 Windows 本地時區執行驗證，使用 C++17、`-Wall -Wextra -pedantic`。
+
+> **測試邊界**：Linux/macOS 與夏令時跳變尚未實機執行；磁盤滿、OS 級重命名與回滾失敗、文件鎖及 ACL 拒絕未做動態故障注入。歷史 `clang-format 23.1.1` 與 `cpplint 2.0.2` 記錄保留其原始工具版本；本次格式及規範檢查結果見 README。
 
 ---
 

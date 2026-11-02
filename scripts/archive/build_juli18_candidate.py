@@ -1,12 +1,42 @@
+"""Historical JULI-18 reproducer; requires original Git history and local archives.
+
+Refuses to overwrite existing outputs. Use ../build_release.py for the current release.
+"""
+
+import argparse
 import hashlib
-import io
 import subprocess
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-OUTPUT = ROOT / 'juli18-review-candidate-v2.zip'
-MANIFEST = ROOT / 'juli18-MANIFEST-v2.sha256'
+ROOT = Path(__file__).resolve().parents[2]
+HISTORICAL_DOCS = '28db82f9108abde117d2b79bae0b24b41908eedf'
+RELOCATED = {
+    'juli11_walkthrough_evidence.md': 'docs/evidence/juli11_walkthrough_evidence.md',
+    'juli12_page_inspection_evidence.md': 'docs/evidence/juli12_page_inspection_evidence.md',
+    'juli13_rehearsal_evidence.md': 'docs/evidence/juli13_rehearsal_evidence.md',
+    'juli14-coverage.md': 'docs/evidence/juli14-coverage.md',
+}
+
+
+def historical_input(name):
+    result = subprocess.run(['git', 'cat-file', '-e', HISTORICAL_DOCS + ':' + name],
+                            cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if result.returncode == 0:
+        return subprocess.check_output(['git', 'show', HISTORICAL_DOCS + ':' + name], cwd=ROOT)
+    # Evidence in the archived original package retains its historical hash.
+    with zipfile.ZipFile(ROOT / 'dist/archive/juli18-review-candidate-v2.zip') as old:
+        for dest, (src, _) in handoff.items():
+            if src == name and dest in old.namelist():
+                return old.read(dest)
+    return (ROOT / RELOCATED.get(name, name)).read_bytes()
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output', type=Path, default=ROOT / 'dist/archive/juli18-review-candidate-v2.zip')
+parser.add_argument('--manifest', type=Path, default=ROOT / 'archive/records/juli18-MANIFEST-v2.sha256')
+args = parser.parse_args()
+OUTPUT = args.output.resolve()
+MANIFEST = args.manifest.resolve()
 COMMIT = 'df3a71477b3635c93c64305f2e941f0ccb5f88b2'
 TREE = 'f805a58a4b143902fedd0b28d0586e59ad32ab1d'
 handoff = {
@@ -35,23 +65,25 @@ def sha(data):
 
 if OUTPUT.exists() or MANIFEST.exists():
     raise SystemExit('Candidate or manifest already exists; refusing to overwrite')
-assert subprocess.check_output(['git', 'rev-parse', COMMIT + '^{tree}'], text=True).strip() == TREE
+assert subprocess.check_output(['git', 'rev-parse', COMMIT + '^{tree}'], text=True, cwd=ROOT).strip() == TREE
+OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+MANIFEST.parent.mkdir(parents=True, exist_ok=True)
 files = {}
 for dest, (src, expected) in handoff.items():
-    data = (ROOT / src).read_bytes()
+    data = historical_input(src)
     if sha(data) != expected:
         raise ValueError(f'Handoff hash mismatch: {src}')
     files[dest] = data
-paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', COMMIT], text=True).splitlines()
+paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', COMMIT], text=True, cwd=ROOT).splitlines()
 for path in paths:
-    files['source/e06/' + path] = subprocess.check_output(['git', 'show', COMMIT + ':' + path])
+    files['source/e06/' + path] = subprocess.check_output(['git', 'show', COMMIT + ':' + path], cwd=ROOT)
 files['source/LICENSE'] = files['source/e06/LICENSE']
-with zipfile.ZipFile(ROOT / 'juli15-review-package.zip') as old:
+with zipfile.ZipFile(ROOT / 'dist/archive/juli15-review-package.zip') as old:
     for name in ('source/e06-source.zip', 'video/juli14-demo.mp4'):
         files[name] = old.read(name)
 assert sha(files['source/e06-source.zip']) == '844645d20ca75de8d3b28a90815040f3e4d4be5da9a4a7904ae201ea6aec593e'
-files['video/juli14-timestamps.txt'] = (ROOT / 'juli14-timestamps.txt').read_bytes()
-files['check_report_assets.py'] = (ROOT / 'check_report_assets.py').read_bytes()
+files['video/juli14-timestamps.txt'] = (ROOT / 'docs/demo/juli14-timestamps.txt').read_bytes()
+files['check_report_assets.py'] = historical_input('check_report_assets.py')
 manifest = ''.join(f'{sha(data)}  {name}\n' for name, data in sorted(files.items())).encode('utf-8')
 files['MANIFEST.sha256'] = manifest
 with zipfile.ZipFile(OUTPUT, 'x', zipfile.ZIP_DEFLATED) as result:

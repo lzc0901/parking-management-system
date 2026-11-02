@@ -12,14 +12,10 @@
 
 #include <ctime>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include "src/fee_calculator.h"
-#include "src/menus.h"
 #include "src/parking_service.h"
-#include "src/storage.h"
 #include "src/vehicle.h"
 
 int main() {
@@ -31,26 +27,6 @@ int main() {
     }
   };
 
-  std::istringstream input("invalid\n1\ninvalid\n0\n2\n0\n0\n");
-  std::ostringstream output;
-  ParkingService menu_service;
-  Storage menu_storage;
-  RunMenu(input, output, menu_service, menu_storage);
-  const auto text = output.str();
-  check(text.find("Invalid choice.") != std::string::npos, "invalid input");
-  check(text.find("Ordinary user session") != std::string::npos,
-        "ordinary session");
-  check(text.find("Administrator session") != std::string::npos,
-        "administrator session after logout");
-
-  std::istringstream eof("1\n");
-  std::ostringstream eof_output;
-  RunMenu(eof, eof_output, menu_service, menu_storage);
-  check(eof_output.str().find("Ordinary user session") != std::string::npos,
-        "EOF in session");
-  VehicleRecord record{"MA-12-34", "Sedan", "White", "2026-11-02 09:30", {}};
-  check(record.plate == "MA-12-34", "vehicle record");
-
   std::string canonical;
   std::time_t now{};
   check(ParseTimestamp("2026-11-02 09:30", canonical, now),
@@ -59,27 +35,6 @@ int main() {
   const auto admin = Role::kAdmin;
   const auto ordinary = Role::kOrdinaryUser;
   const auto ok = VehicleResult::kOk;
-  struct FeeCase {
-    int minutes;
-    int mop;
-  };
-  const FeeCase fee_cases[] = {{0, 0},      {1, 20},     {60, 20},
-                               {61, 40},    {1199, 400}, {1200, 400},
-                               {1439, 400}, {1440, 400}, {1441, 420},
-                               {2640, 800}, {2880, 800}, {2881, 820}};
-  for (const auto& test : fee_cases) {
-    ParkingFee fee;
-    check(CalculateParkingFee(now, now + test.minutes * 60 + 59, fee) &&
-              fee.total_minutes == test.minutes && fee.mop == test.mop &&
-              fee.days == test.minutes / 1440 &&
-              fee.hours == (test.minutes % 1440) / 60 &&
-              fee.minutes == test.minutes % 60,
-          "fee boundary and duration");
-  }
-  ParkingFee unchanged;
-  unchanged.mop = 123;
-  check(!CalculateParkingFee(now, now - 60, unchanged) && unchanged.mop == 123,
-        "negative fee rejected without output mutation");
   check(service.Count() == 0 && service.ListAll().empty() &&
             !service.FindByPlate("unknown"),
         "empty lot");
@@ -176,5 +131,5 @@ int main() {
             service.Count() == 0 && service.ListAll().empty(),
         "delete and count");
   if (failures) return 1;
-  std::cout << "All foundation, vehicle service and fee tests passed.\n";
+  std::cout << "Parking service tests passed.\n";
 }

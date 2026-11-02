@@ -66,3 +66,11 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Release products and local historical material
+/dist/
+/archive/
+/.multica/
+/docs/demo/
+/docs/references/
+__pycache__/

@@ -20,6 +20,34 @@
 #include "src/storage.h"
 
 int main() {
+  int failures = 0;
+  auto check = [&](bool condition, const char* name) {
+    if (!condition) {
+      std::cerr << "FAIL: " << name << '\n';
+      ++failures;
+    }
+  };
+
+  {
+    std::istringstream input("invalid\n1\ninvalid\n0\n2\n0\n0\n");
+    std::ostringstream output;
+    ParkingService menu_service;
+    Storage menu_storage;
+    RunMenu(input, output, menu_service, menu_storage);
+    const auto text = output.str();
+    check(text.find("Invalid choice.") != std::string::npos, "invalid input");
+    check(text.find("Ordinary user session") != std::string::npos,
+          "ordinary session");
+    check(text.find("Administrator session") != std::string::npos,
+          "administrator session after logout");
+
+    std::istringstream eof("1\n");
+    std::ostringstream eof_output;
+    RunMenu(eof, eof_output, menu_service, menu_storage);
+    check(eof_output.str().find("Ordinary user session") != std::string::npos,
+          "EOF in session");
+  }
+  if (failures) return 5;
   auto path =
       std::filesystem::temp_directory_path() / "parking_menu_test_e05.txt";
   std::filesystem::remove(path);

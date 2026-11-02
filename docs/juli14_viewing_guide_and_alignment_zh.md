@@ -1,5 +1,7 @@
 # 酒店停車場管理系統（Hotel Parking Management System）實機演示錄屏中文觀看指南與時間戳核對清單
 
+> 目錄更新：本文件位於 `docs/`；歷史視頻和時間戳位於本地 `docs/demo/`，舊 ZIP 位於 `dist/archive/`。這些歷史材料不隨當前交付包發布。命令從項目根目錄執行。
+
 **對應議題**：[JULI-14](mention://issue/01a1980f-6fa0-7a86-8493-7c59850c53b5)（D04: Capture and verify the required full-process screen recording）  
 **關聯演示腳本議題**：[JULI-13](mention://issue/01a1980f-6878-713b-9e89-a8be7590f771)（D03: Prepare and rehearse the complete demonstration script）  
 **對應視頻文件**：`juli14-demo.mp4`（H.264 MP4，解析度 `1498 × 770`，幀率 `10 fps`，總時長 `02:57.6`，SHA-256：`d2930f896445e7f88a8155899585362cbe6ca140ca4341320a022e024cf3b109`）  

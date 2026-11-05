@@ -4,6 +4,27 @@ This C++17 application supports validated vehicle CRUD, counts, duration and fee
 
 ## Build and run
 
+### Prebuilt Windows executable (`bin/parking.exe`)
+
+A prebuilt 64-bit Windows console executable is available at [bin/parking.exe](bin/parking.exe), alongside [SHA256SUMS.txt](bin/SHA256SUMS.txt) and [BUILD_INFO.txt](bin/BUILD_INFO.txt). Open the executable link on GitHub and download the file, or clone the repository. From a writable repository root containing `bin/`, verify and run it with:
+
+```powershell
+Get-FileHash bin/parking.exe -Algorithm SHA256
+Get-Content bin/SHA256SUMS.txt
+./bin/parking.exe
+```
+
+- **Expected SHA-256**: `b7b54c3bc548dabc7f6d6fb62d8cf77ad24e0a67fde3b729a22344c753d51ed8` (matches `bin/SHA256SUMS.txt` and the `bin/parking.exe` bundled in the release ZIP).
+- **Runtime requirements and compatibility boundaries**:
+  - Built with `clang 23.1.1` (`LLVM-MinGW UCRT`, target `x86_64-w64-windows-gnu`, `-std=c++17 -Wall -Wextra -pedantic -static`) as a Windows x86-64 console executable (PE subsystem version `6.0`).
+  - Requires **64-bit Windows (x64)** and the **Windows Universal C Runtime (UCRT)**. Only `KERNEL32.dll` and UCRT API set DLLs (`api-ms-win-crt-*-l1-1-0.dll`) are imported; no separate compiler runtime DLL is required (see `bin/BUILD_INFO.txt`).
+  - Verified on the build machine (`Windows NT 10.0.26300.0` x64) across all six C++ test runners, `tests/e2e/test_e2e.ps1`, and an isolated multi-process E2E smoke test directly against `bin/parking.exe` (ordinary queries, administrator CRUD, fee output, clean exit, and restart persistence). Clean-OS installations and other Windows releases have not been tested; the PE subsystem version (`6.0`) is a header metadata field and does not by itself prove compatibility across unverified Windows versions.
+- **Default data file and working directory**:
+  - On startup, the program reads and writes `parking_data.txt` in the **current working directory** (the directory from which `parking.exe` is launched, not the directory containing the `.exe`).
+  - Always launch `parking.exe` from a writable directory; during saves it creates temporary `parking_data.txt.tmp` and backup `parking_data.txt.bak` files in the same directory. Personal vehicle data and runtime `.tmp`/`.bak` files are ignored by Git and excluded from repository delivery.
+
+### Build from source
+
 Install a C++17 compiler (GCC, Clang or an equivalent). From the repository root in PowerShell, using GCC:
 
 ```powershell
@@ -17,6 +38,7 @@ Select `1` for ordinary user, `2` for administrator, or `0` to exit. In a sessio
 ## Project structure
 
 ```text
+bin/                         Tracked Windows x64 executable (parking.exe), SHA256SUMS.txt and BUILD_INFO.txt
 src/                         C++17 application sources (unchanged)
 tests/unit/                  vehicle, time and fee runners
 tests/integration/           parking service, menus and storage runners
@@ -132,7 +154,11 @@ Get-FileHash dist/parking-management-system-v1.0.zip -Algorithm SHA256
 The release contains `src/`, `tests/`, maintained `docs/`, `bin/parking.exe`,
 README, LICENSE and `.clang-format` under `parking-management-system-v1.0/`.
 Historical evidence, video, assignment references, scripts and old archives are
-excluded. The Windows executable uses static compiler runtime linking.
+excluded. The Windows executable uses static compiler runtime linking. For the
+tracked release, the validated `build/parking.exe` was manually copied to
+`bin/parking.exe`, matching the executable in that release ZIP. The script
+does not update `bin/`; a subsequent build may produce different bytes.
+`bin/SHA256SUMS.txt` and `bin/BUILD_INFO.txt` describe the tracked executable;
 `dist/SHA256SUMS.txt` records the ZIP checksum.
 
 `scripts/archive/build_juli18_candidate.py` reproduces a historical package,

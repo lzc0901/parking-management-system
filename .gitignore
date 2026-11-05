@@ -35,6 +35,7 @@
 
 # Executables
 *.exe
+!/bin/parking.exe
 *.out
 *.app
 
@@ -74,3 +75,4 @@ Testing/
 /docs/demo/
 /docs/references/
 __pycache__/
+parking_data.txt

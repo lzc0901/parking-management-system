@@ -1,0 +1,11 @@
+Source baseline commit: a1b6e854bca132db219d01287abfb48777555560
+Application source changes from baseline: none (src/*.cpp and src/*.h).
+Compiler: clang version 23.1.1, LLVM-MinGW UCRT, x86_64-w64-windows-gnu
+Target: Windows x86-64, console subsystem; PE subsystem version 6.0.
+Build environment: Windows NT 10.0.26300.0 x64, Python 3.11.9.
+Build entry point: python scripts/build_release.py
+Compiler command (from repository root; output path shown relative to root):
+g++ -std=c++17 -Wall -Wextra -pedantic -static -I. src/admin_user.cpp src/fee_calculator.cpp src/main.cpp src/menus.cpp src/ordinary_user.cpp src/parking_service.cpp src/storage.cpp src/vehicle.cpp -o build/parking.exe
+The validated build/parking.exe was copied to bin/parking.exe; the release ZIP contains identical executable bytes.
+Imported DLLs: KERNEL32.dll and api-ms-win-crt-{stdio,runtime,locale,time,heap,private,string,convert,multibyte,math,environment,filesystem}-l1-1-0.dll. The Universal C Runtime is required; no separate compiler runtime DLL is imported.
+Validation was performed on the build machine, not a clean Windows installation. The PE subsystem version alone does not establish compatibility with every Windows release.

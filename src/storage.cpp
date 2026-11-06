@@ -52,7 +52,8 @@ StorageResult ParseFile(const fs::path& path, ParkingService& result) {
     std::time_t timestamp{};
     if (!ParseTimestamp(record.entry_time_text, canonical, timestamp))
       return {false, "Line " + std::to_string(number) + ": invalid timestamp."};
-    const auto status = candidate.AddVehicle(Role::kAdmin, record, timestamp);
+    const auto status =
+        candidate.RestoreVehicle(Role::kAdmin, record, timestamp);
     if (status != VehicleResult::kOk)
       return {false, "Line " + std::to_string(number) +
                          (status == VehicleResult::kDuplicatePlate
@@ -62,8 +63,12 @@ StorageResult ParseFile(const fs::path& path, ParkingService& result) {
   if (in.bad())
     return {false, "Error reading " + path.string() +
                        "; preserve the file and check the disk."};
+  const bool collisions = candidate.HasPlateCollisions();
   result = std::move(candidate);
-  return {true, "Loaded " + path.string() + "."};
+  return {true, "Loaded " + path.string() +
+                    (collisions ? ". Warning: ambiguous historical plate "
+                                  "matches; records were preserved."
+                                : ".")};
 }
 }  // namespace
 Storage::Storage(fs::path path) : path_(std::move(path)) {}
@@ -88,7 +93,8 @@ StorageResult Storage::Load(ParkingService& service) {
     if (ec)
       return {false, "Backup recovery failed; preserve " + backup.string() +
                          ": " + ec.message()};
-    result.message = "Recovered parking data from " + backup.string() + ".";
+    result.message = "Recovered parking data from " + backup.string() + ". " +
+                     result.message;
   }
   service = std::move(candidate);
   blocked_ = false;
@@ -110,7 +116,7 @@ StorageResult Storage::Save(const ParkingService& service) {
     std::string canonical;
     std::time_t timestamp{};
     if (!ParseTimestamp(record.entry_time_text, canonical, timestamp) ||
-        checked.AddVehicle(Role::kAdmin, record, timestamp) !=
+        checked.RestoreVehicle(Role::kAdmin, record, timestamp) !=
             VehicleResult::kOk)
       return {false, "Invalid record; data file was not changed."};
   }

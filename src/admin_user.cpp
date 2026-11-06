@@ -13,12 +13,15 @@
 #include "src/admin_user.h"
 
 #include <ctime>
+#include <iomanip>
 #include <istream>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 #include "src/menus.h"
 #include "src/parking_service.h"
+#include "src/plate_recognition.h"
 #include "src/storage.h"
 #include "src/vehicle.h"
 
@@ -45,6 +48,8 @@ static const char* Message(VehicleResult result) {
       return "Entry time is in the future.";
     case VehicleResult::kDuplicatePlate:
       return "Plate already exists.";
+    case VehicleResult::kAmbiguousPlate:
+      return "Ambiguous plate: multiple historical records match.";
     case VehicleResult::kNotFound:
       return "Vehicle not found.";
     case VehicleResult::kOk:
@@ -53,13 +58,58 @@ static const char* Message(VehicleResult result) {
   return "Operation failed.";
 }
 bool RunAdminUserSession(std::istream& in, std::ostream& out,
-                         ParkingService& service, Storage& storage) {
+                         ParkingService& service, Storage& storage,
+                         PlateRecognizer* recognizer) {
   std::string choice;
   while (true) {
     out << "Administrator session: 1 = list, 2 = find, 3 = count, 4 = add, 5 = "
-           "modify, 6 = delete, 0 = logout\n> ";
+           "modify, 6 = delete";
+    if (recognizer) out << ", 7 = image registration";
+    out << ", 0 = logout\n> ";
     if (!std::getline(in, choice)) return false;
     if (choice == "0") return true;
+    if (choice == "7" && recognizer) {
+      VehicleRecord record;
+      const auto selected =
+          ReadConfirmedPlate(in, out, *recognizer, record.plate);
+      if (selected == PlateInputResult::kEndOfInput) return false;
+      if (selected == PlateInputResult::kCancelled) continue;
+      out << "Category: ";
+      if (!std::getline(in, record.category)) return false;
+      out << "Color: ";
+      if (!std::getline(in, record.color)) return false;
+      out << "Entry time (YYYY-MM-DD HH:MM; empty = current time): ";
+      if (!std::getline(in, record.entry_time_text)) return false;
+      out << "Confirm registration of " << record.plate << " | "
+          << record.category << " | " << record.color << " | "
+          << (record.entry_time_text.empty() ? "current time"
+                                             : record.entry_time_text)
+          << "? (y/n): ";
+      if (!std::getline(in, choice)) return false;
+      if (choice != "y" && choice != "Y") continue;
+      const auto now = std::time(nullptr);
+      if (record.entry_time_text.empty()) {
+        const auto* local = std::localtime(&now);
+        if (!local) {
+          out << "Unable to read local time.\n";
+          continue;
+        }
+        std::ostringstream formatted;
+        formatted << std::put_time(local, "%Y-%m-%d %H:%M");
+        record.entry_time_text = formatted.str();
+      }
+      const auto result = service.AddVehicle(Role::kAdmin, record, now);
+      if (result != VehicleResult::kOk) {
+        out << Message(result) << '\n';
+        continue;
+      }
+      const auto saved = storage.Save(service);
+      if (saved.ok)
+        out << "Updated and saved. " << saved.message << '\n';
+      else
+        out << "Updated in memory, but save failed: " << saved.message << '\n';
+      continue;
+    }
     if (choice != "4" && choice != "5" && choice != "6") {
       if (!RunReadChoice(choice, in, out, service)) return false;
       continue;

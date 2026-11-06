@@ -57,6 +57,8 @@ bool RunReadChoice(const std::string& choice, std::istream& in,
     const auto result = service.FindWithFee(plate, std::time(nullptr), row);
     if (result == VehicleResult::kNotFound)
       out << "Vehicle not found.\n";
+    else if (result == VehicleResult::kAmbiguousPlate)
+      out << "Ambiguous plate: multiple historical records match.\n";
     else if (result != VehicleResult::kOk)
       out << "Unable to retrieve vehicle or calculate duration.\n";
     else
@@ -69,7 +71,7 @@ bool RunReadChoice(const std::string& choice, std::istream& in,
 }
 
 void RunMenu(std::istream& in, std::ostream& out, ParkingService& service,
-             Storage& storage) {
+             Storage& storage, PlateRecognizer* recognizer) {
   std::string choice;
   out << "Fee: 20 MOP per started hour, capped at 400 MOP per successive "
          "24-hour block.\n";
@@ -77,9 +79,9 @@ void RunMenu(std::istream& in, std::ostream& out, ParkingService& service,
     out << "Parking system: 1 = ordinary, 2 = administrator, 0 = exit\n> ";
     if (!std::getline(in, choice) || choice == "0") return;
     if (choice == "1") {
-      if (!RunOrdinaryUserSession(in, out, service)) return;
+      if (!RunOrdinaryUserSession(in, out, service, recognizer)) return;
     } else if (choice == "2") {
-      if (!RunAdminUserSession(in, out, service, storage)) return;
+      if (!RunAdminUserSession(in, out, service, storage, recognizer)) return;
     } else {
       out << "Invalid choice.\n";
     }

@@ -6,6 +6,8 @@ This C++17 application supports validated vehicle CRUD, counts, duration and fee
 
 ### Prebuilt Windows executable (`bin/parking.exe`)
 
+A historical manual-only binary is retained here; it does not include the image
+feature. Use the source build or image-enabled release described below for it.
 A prebuilt 64-bit Windows console executable is available at [bin/parking.exe](bin/parking.exe), alongside [SHA256SUMS.txt](bin/SHA256SUMS.txt) and [BUILD_INFO.txt](bin/BUILD_INFO.txt). Open the executable link on GitHub and download the file, or clone the repository. From a writable repository root containing `bin/`, verify and run it with:
 
 ```powershell
@@ -14,7 +16,7 @@ Get-Content bin/SHA256SUMS.txt
 ./bin/parking.exe
 ```
 
-- **Expected SHA-256**: `b7b54c3bc548dabc7f6d6fb62d8cf77ad24e0a67fde3b729a22344c753d51ed8` (matches `bin/SHA256SUMS.txt` and the `bin/parking.exe` bundled in the release ZIP).
+- **Expected SHA-256**: `b7b54c3bc548dabc7f6d6fb62d8cf77ad24e0a67fde3b729a22344c753d51ed8` (matches `bin/SHA256SUMS.txt`).
 - **Runtime requirements and compatibility boundaries**:
   - Built with `clang 23.1.1` (`LLVM-MinGW UCRT`, target `x86_64-w64-windows-gnu`, `-std=c++17 -Wall -Wextra -pedantic -static`) as a Windows x86-64 console executable (PE subsystem version `6.0`).
   - Requires **64-bit Windows (x64)** and the **Windows Universal C Runtime (UCRT)**. Only `KERNEL32.dll` and UCRT API set DLLs (`api-ms-win-crt-*-l1-1-0.dll`) are imported; no separate compiler runtime DLL is required (see `bin/BUILD_INFO.txt`).
@@ -25,7 +27,19 @@ Get-Content bin/SHA256SUMS.txt
 
 ### Build from source
 
-Install a C++17 compiler (GCC, Clang or an equivalent). From the repository root in PowerShell, using GCC:
+For the image-enabled Windows x64 build install Python 3 with pip, Git and
+LLVM-MinGW UCRT (tested with clang 23.1.1). From PowerShell run:
+
+```powershell
+./scripts/build_image.ps1
+./build/image-test/parking.exe
+```
+
+The script downloads CMake 3.31.10, Ninja 1.11.1.4, OpenCV 4.10.0 and
+nlohmann/json 3.11.3 into `build/`, checks the source revisions, builds static
+OpenCV and runs offline image tests. It does not install tools globally. Windows
+UCRT and WinHTTP are required at runtime. A C++17-only build without image
+recognition is also available:
 
 ```powershell
 New-Item -ItemType Directory -Force build
@@ -34,6 +48,34 @@ g++ -std=c++17 -Wall -Wextra -pedantic -I. src/*.cpp -o build/parking.exe
 ```
 
 Select `1` for ordinary user, `2` for administrator, or `0` to exit. In a session select `0` to log out. End-of-file exits safely.
+
+For image recognition, set `GEMINI_API_KEY` and `GEMINI_MODEL` in the current
+process environment before starting the image-enabled executable:
+
+```powershell
+$env:GEMINI_API_KEY = '<your-key>'
+$env:GEMINI_MODEL = '<image-and-structured-output-capable-model>'
+./build/image-test/parking.exe
+```
+
+Use ordinary menu 4 to query or administrator menu 7 to register. The program
+asks before sending each picture to Gemini. Select one of multiple candidates,
+correct it when necessary and confirm it; an administrator must also confirm
+the complete registration. Images are processed in memory, not saved alongside
+parking records. JPG/PNG inputs are limited to 10 MiB and 16 million pixels,
+and resized to at most 2048 pixels on their longest side. Failures allow manual
+entry or cancellation. The role selector is not authentication. Do not put keys
+in source control or logs. No real Gemini request or Macau sample accuracy test
+has been performed for this change.
+
+Plate matching ignores ASCII case, spaces and hyphens, and never substitutes
+letters for digits. Historical spelling is preserved. If several old records
+share a comparison key, loading warns and ambiguous lookups and changes are
+rejected; the records are retained. Ordinary numbered Macau plates and
+personalized plates have different forms ([Macau regulation, article 55](https://bo.dsaj.gov.mo/bo/i/93/17/codestpt/declei17an.asp?mobile=1),
+[personalized plate service](https://www.gov.mo/pt/servicos/ps-2208/ps-2208a/)).
+Recognition does not guarantee coverage of special plates; users must inspect
+and correct every result or use manual entry.
 
 ## Project structure
 
@@ -105,7 +147,7 @@ The role selector opens ordinary and administrator sessions. Both can list vehic
 To run the menu integration tests after creating `build`:
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra -pedantic -I. tests/integration/test_menus.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp -o build/test_menus.exe
+g++ -std=c++17 -Wall -Wextra -pedantic -I. tests/integration/test_menus.cpp src/menus.cpp src/ordinary_user.cpp src/admin_user.cpp src/vehicle.cpp src/parking_service.cpp src/fee_calculator.cpp src/storage.cpp src/plate_recognition.cpp -o build/test_menus.exe
 ./build/test_menus.exe
 ```
 
@@ -147,18 +189,17 @@ uvx --from cpplint==2.0.2 cpplint --recursive src tests
 ```powershell
 python scripts/build_release.py
 python scripts/check_report_assets.py docs
-python scripts/check_report_assets.py dist/parking-management-system-v1.0.zip
-Get-FileHash dist/parking-management-system-v1.0.zip -Algorithm SHA256
+python scripts/check_report_assets.py dist/parking-management-system-image.zip
+Get-FileHash dist/parking-management-system-image.zip -Algorithm SHA256
 ```
 
 The release contains `src/`, `tests/`, maintained `docs/`, `bin/parking.exe`,
-README, LICENSE and `.clang-format` under `parking-management-system-v1.0/`.
-Historical evidence, video, assignment references, scripts and old archives are
-excluded. The Windows executable uses static compiler runtime linking. For the
-tracked release, the validated `build/parking.exe` was manually copied to
-`bin/parking.exe`, matching the executable in that release ZIP. The script
-does not update `bin/`; a subsequent build may produce different bytes.
-`bin/SHA256SUMS.txt` and `bin/BUILD_INFO.txt` describe the tracked executable;
+README, LICENSE, build script and third-party licenses under
+`parking-management-system-image/`. Historical evidence, video, assignment
+references and old archives are excluded. OpenCV and compiler runtimes are
+linked statically; Windows UCRT and WinHTTP are required. The script does not
+update the historical `bin/parking.exe`; `bin/SHA256SUMS.txt` and
+`bin/BUILD_INFO.txt` describe that older executable.
 `dist/SHA256SUMS.txt` records the ZIP checksum.
 
 `scripts/archive/build_juli18_candidate.py` reproduces a historical package,

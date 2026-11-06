@@ -15,9 +15,11 @@
 
 #include <iosfwd>
 class ParkingService;
+class PlateRecognizer;
 
 // Return false on end-of-input so the application can exit cleanly.
 bool RunOrdinaryUserSession(std::istream& in, std::ostream& out,
-                            const ParkingService& service);
+                            const ParkingService& service,
+                            PlateRecognizer* recognizer = nullptr);
 
 #endif  // SRC_ORDINARY_USER_H_

@@ -16,11 +16,12 @@
 #include <iosfwd>
 #include <string>
 class ParkingService;
+class PlateRecognizer;
 class Storage;
 
 // Run the role selector until exit or end-of-input.
 void RunMenu(std::istream& in, std::ostream& out, ParkingService& service,
-             Storage& storage);
+             Storage& storage, PlateRecognizer* recognizer = nullptr);
 // Handles a read-only menu choice; returns false on end-of-input.
 bool RunReadChoice(const std::string& choice, std::istream& in,
                    std::ostream& out, const ParkingService& service);

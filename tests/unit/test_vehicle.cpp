@@ -38,7 +38,12 @@ int main() {
     check(!NormalizeField(invalid, false, value) && value == "unchanged",
           "invalid fields preserve output");
   }
-  check(!NormalizeField("MA 12", true, value), "plate space rejected");
+  check(NormalizeField("ma 12", true, value) && value == "ma 12",
+        "plate spelling retained");
+  check(PlateComparisonKey("ma-12 34", value) && value == "MA1234",
+        "plate comparison key");
+  check(PlateComparisonKey("O-01", value) && value == "O01",
+        "letter O is not replaced by zero");
   if (failures) return 1;
   std::cout << "Vehicle tests passed.\n";
 }

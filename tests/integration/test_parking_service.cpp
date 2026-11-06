@@ -75,9 +75,14 @@ int main() {
   check(service.AddVehicle(admin, a, now) == VehicleResult::kDuplicatePlate,
         "duplicate rejected");
   auto invalid = a;
-  invalid.plate = "MA 12";
+  invalid.plate = "   ";
   check(service.AddVehicle(admin, invalid, now) == VehicleResult::kInvalidField,
-        "plate space rejected");
+        "empty comparison key rejected");
+  check(service.FindByPlate("ma 12 34") &&
+            service.AddVehicle(
+                admin, {"ma1234", "SUV", "Black", "2026-11-02 09:30", {}},
+                now) == VehicleResult::kDuplicatePlate,
+        "comparison ignores case, spaces and hyphens");
   invalid = a;
   invalid.category = "   ";
   check(service.AddVehicle(admin, invalid, now) == VehicleResult::kInvalidField,

@@ -15,6 +15,11 @@
 #include "src/menus.h"
 #include "src/parking_service.h"
 #include "src/storage.h"
+#ifdef PARKING_WITH_GEMINI
+#include <windows.h>
+
+#include "src/image/gemini_recognizer.h"
+#endif
 
 int main() {
   ParkingService service;
@@ -22,7 +27,14 @@ int main() {
   auto loaded = storage.Load(service);
   std::cout << loaded.message << '\n';
   if (!loaded.ok) return 1;
+#ifdef PARKING_WITH_GEMINI
+  SetConsoleCP(CP_UTF8);
+  SetConsoleOutputCP(CP_UTF8);
+  GeminiRecognizer recognizer;
+  RunMenu(std::cin, std::cout, service, storage, &recognizer);
+#else
   RunMenu(std::cin, std::cout, service, storage);
+#endif
   auto saved = storage.Save(service);
   std::cout << saved.message << '\n';
   return saved.ok ? 0 : 1;

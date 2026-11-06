@@ -15,10 +15,12 @@
 
 #include <iosfwd>
 class ParkingService;
+class PlateRecognizer;
 class Storage;
 
 // Return false on end-of-input so the application can exit cleanly.
 bool RunAdminUserSession(std::istream& in, std::ostream& out,
-                         ParkingService& service, Storage& storage);
+                         ParkingService& service, Storage& storage,
+                         PlateRecognizer* recognizer = nullptr);
 
 #endif  // SRC_ADMIN_USER_H_

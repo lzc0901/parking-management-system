@@ -86,6 +86,28 @@ int main() {
   check(!result.ok && result.message.find("duplicate") != std::string::npos &&
             !duplicate.Save(recovered).ok,
         "duplicate blocks save");
+  {
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    out << "MA-12-34\tSUV\tWhite\t2026-11-01 08:30\n"
+           "ma1234\tSUV\tBlack\t2026-11-01 08:30\n";
+  }
+  Storage collision(path);
+  ParkingService preserved;
+  VehicleFeeView ambiguous;
+  const auto collision_load = collision.Load(preserved);
+  check(collision_load.ok &&
+            collision_load.message.find("ambiguous") != std::string::npos &&
+            preserved.Count() == 2 &&
+            preserved.FindWithFee("MA 12 34", now, ambiguous) ==
+                VehicleResult::kAmbiguousPlate &&
+            collision.Save(preserved).ok,
+        "historical normalized collision retained and reported");
+  ParkingService again;
+  Storage collision_restart(path);
+  check(collision_restart.Load(again).ok && again.Count() == 2 &&
+            again.FindWithFee("ma1234", now, ambiguous) ==
+                VehicleResult::kAmbiguousPlate,
+        "collision survives save and reload");
   fs::remove(path);
   {
     std::ofstream out(path.string() + ".bak");

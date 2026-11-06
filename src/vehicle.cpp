@@ -23,8 +23,29 @@ bool NormalizeField(const std::string& input, bool plate, std::string& output) {
   if (first == std::string::npos) return false;
   const auto value =
       input.substr(first, input.find_last_not_of(' ') - first + 1);
-  if (plate && value.find(' ') != std::string::npos) return false;
+  if (plate) {
+    std::string key;
+    if (!PlateComparisonKey(value, key)) return false;
+  }
   output = value;
+  return true;
+}
+
+bool PlateComparisonKey(const std::string& input, std::string& output) {
+  std::string key;
+  for (unsigned char c : input) {
+    if (c < 0x20 || c == 0x7f) return false;
+    if (c == ' ' || c == '-') continue;
+    if (c >= 'a' && c <= 'z') c = static_cast<unsigned char>(c - 'a' + 'A');
+    key.push_back(static_cast<char>(c));
+  }
+  if (key.empty()) {
+    // Preserve historical separator-only values that were valid previously.
+    for (char c : input)
+      if (c == '-') key.push_back(c);
+  }
+  if (key.empty()) return false;
+  output = key;
   return true;
 }
 

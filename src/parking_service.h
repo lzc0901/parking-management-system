@@ -30,6 +30,7 @@ enum class VehicleResult {
   kInvalidTime,
   kFutureTime,
   kDuplicatePlate,
+  kAmbiguousPlate,
   kNotFound
 };
 // Pairs a vehicle snapshot with its fee at a common reference time.
@@ -44,6 +45,10 @@ class ParkingService {
   // Validates and adds a record for an administrator.
   VehicleResult AddVehicle(Role role, const VehicleRecord& record,
                            std::time_t reference);
+  // Storage restoration preserves separately spelled historical records.
+  VehicleResult RestoreVehicle(Role role, const VehicleRecord& record,
+                               std::time_t reference);
+  bool HasPlateCollisions() const;
   // Replaces a record identified by plate after validation.
   VehicleResult ModifyVehicle(Role role, const std::string& plate,
                               const VehicleRecord& record,
@@ -63,6 +68,7 @@ class ParkingService {
   std::size_t Count() const { return records_.size(); }
 
  private:
+  VehicleResult ResolvePlate(const std::string& plate, std::string& key) const;
   std::map<std::string, VehicleRecord> records_;
 };
 

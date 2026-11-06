@@ -43,9 +43,48 @@ VehicleResult ParkingService::AddVehicle(Role role, const VehicleRecord& record,
   VehicleRecord candidate;
   const auto result = Validated(record, reference, candidate);
   if (result != VehicleResult::kOk) return result;
+  std::string existing;
+  if (ResolvePlate(candidate.plate, existing) != VehicleResult::kNotFound)
+    return VehicleResult::kDuplicatePlate;
+  records_.emplace(candidate.plate, candidate);
+  return VehicleResult::kOk;
+}
+
+VehicleResult ParkingService::RestoreVehicle(Role role,
+                                             const VehicleRecord& record,
+                                             std::time_t reference) {
+  if (role != Role::kAdmin) return VehicleResult::kForbidden;
+  VehicleRecord candidate;
+  const auto result = Validated(record, reference, candidate);
+  if (result != VehicleResult::kOk) return result;
   if (records_.count(candidate.plate)) return VehicleResult::kDuplicatePlate;
   records_.emplace(candidate.plate, candidate);
   return VehicleResult::kOk;
+}
+
+bool ParkingService::HasPlateCollisions() const {
+  for (const auto& entry : records_) {
+    std::string key;
+    if (ResolvePlate(entry.first, key) == VehicleResult::kAmbiguousPlate)
+      return true;
+  }
+  return false;
+}
+
+VehicleResult ParkingService::ResolvePlate(const std::string& plate,
+                                           std::string& key) const {
+  std::string wanted;
+  if (!PlateComparisonKey(plate, wanted)) return VehicleResult::kInvalidField;
+  bool found = false;
+  for (const auto& entry : records_) {
+    std::string comparison;
+    if (!PlateComparisonKey(entry.first, comparison) || comparison != wanted)
+      continue;
+    if (found) return VehicleResult::kAmbiguousPlate;
+    key = entry.first;
+    found = true;
+  }
+  return found ? VehicleResult::kOk : VehicleResult::kNotFound;
 }
 
 VehicleResult ParkingService::ModifyVehicle(Role role, const std::string& plate,
@@ -53,13 +92,16 @@ VehicleResult ParkingService::ModifyVehicle(Role role, const std::string& plate,
                                             std::time_t reference) {
   if (role != Role::kAdmin) return VehicleResult::kForbidden;
   std::string key;
-  if (!NormalizeField(plate, true, key)) return VehicleResult::kInvalidField;
+  const auto lookup = ResolvePlate(plate, key);
+  if (lookup != VehicleResult::kOk) return lookup;
   auto current = records_.find(key);
-  if (current == records_.end()) return VehicleResult::kNotFound;
   VehicleRecord candidate;
   const auto result = Validated(record, reference, candidate);
   if (result != VehicleResult::kOk) return result;
-  if (candidate.plate != key && records_.count(candidate.plate))
+  std::string target;
+  const auto match = ResolvePlate(candidate.plate, target);
+  if (match == VehicleResult::kAmbiguousPlate ||
+      (match == VehicleResult::kOk && target != key))
     return VehicleResult::kDuplicatePlate;
   if (candidate.plate == key) {
     current->second = candidate;
@@ -74,14 +116,15 @@ VehicleResult ParkingService::DeleteVehicle(Role role,
                                             const std::string& plate) {
   if (role != Role::kAdmin) return VehicleResult::kForbidden;
   std::string key;
-  if (!NormalizeField(plate, true, key)) return VehicleResult::kInvalidField;
+  const auto lookup = ResolvePlate(plate, key);
+  if (lookup != VehicleResult::kOk) return lookup;
   return records_.erase(key) ? VehicleResult::kOk : VehicleResult::kNotFound;
 }
 
 const VehicleRecord* ParkingService::FindByPlate(
     const std::string& plate) const {
   std::string key;
-  if (!NormalizeField(plate, true, key)) return nullptr;
+  if (ResolvePlate(plate, key) != VehicleResult::kOk) return nullptr;
   const auto it = records_.find(key);
   return it == records_.end() ? nullptr : &it->second;
 }
@@ -96,7 +139,8 @@ VehicleResult ParkingService::FindWithFee(const std::string& plate,
                                           std::time_t reference,
                                           VehicleFeeView& output) const {
   std::string key;
-  if (!NormalizeField(plate, true, key)) return VehicleResult::kInvalidField;
+  const auto lookup = ResolvePlate(plate, key);
+  if (lookup != VehicleResult::kOk) return lookup;
   const auto it = records_.find(key);
   if (it == records_.end()) return VehicleResult::kNotFound;
   VehicleFeeView view{it->second, {}};

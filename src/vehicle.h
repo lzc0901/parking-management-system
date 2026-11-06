@@ -27,6 +27,8 @@ struct VehicleRecord {
 
 // Reject ASCII controls before trimming outer ASCII spaces.
 bool NormalizeField(const std::string& input, bool plate, std::string& output);
+// Comparison key only: retain stored spelling and never substitute O and 0.
+bool PlateComparisonKey(const std::string& input, std::string& output);
 bool ParseTimestamp(const std::string& input, std::string& canonical,
                     std::time_t& timestamp);
 bool NormalizeToMinute(std::time_t input, std::time_t& output);

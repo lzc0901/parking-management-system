@@ -18,7 +18,7 @@ flowchart TD
     OrdLoop --> OrdChoice{"讀取操作選項"}
     OrdChoice -- "EOF" --> FinalSave
     OrdChoice -- "0 (logout)" --> RolePrompt
-    OrdChoice -- "1 / 2 / 3" --> ReadOp["調用 RunReadChoice()<br/>查詢列表 / 單車查找 / 統計數量"]
+    OrdChoice -- "1 / 2 / 3" --> ReadOp["調用 RunReadChoice()<br/>1 = 查詢列表 / 2 = 單車查找 / 3 = 統計數量"]
     ReadOp --> OrdLoop
     OrdChoice -- "其他輸入 (如 4/5/6)" --> OrdInvalid["輸出 Invalid choice."] --> OrdLoop
     RoleInput -- "choice == 2" --> AdmLoop["管理員會話 RunAdminUserSession()<br/>1=list, 2=find, 3=count, 4=add, 5=modify, 6=delete, 0=logout"]
@@ -84,6 +84,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph LoadFlow ["A. 啟動載入與備份恢復 Storage::Load()"]
+        direction TB
         LStart(["開始 Load(): 預設 blocked_ = true"]) --> LCheck["檢查 parking_data.txt 與 .bak 是否存在"]
         LCheck --> LNone{"兩者均不存在?"}
         LNone -- "是 (首次運行)" --> LFirst["清空 service，設 blocked_ = false<br/>返回 First run: no parking data file."]
@@ -97,6 +98,7 @@ flowchart TD
     end
 
     subgraph SaveFlow ["B. 多步驟安全保存與失敗回滾協議 Storage::Save()"]
+        direction TB
         SStart(["開始 Save()"]) --> SBlocked{"blocked_ == true ?"}
         SBlocked -- "是" --> SReject(["拒絕保存: Save blocked: resolve the<br/>load or recovery error and reload first."])
         SBlocked -- "否" --> SWriteTmp["校驗內存快照並寫入 parking_data.txt.tmp<br/>(含 # PARKING_SYSTEM_V1 與升序 TSV 行)"]

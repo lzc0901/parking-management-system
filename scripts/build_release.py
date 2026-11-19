@@ -74,9 +74,9 @@ if ($LASTEXITCODE -ne 0) { throw "Compilation failed" }
 ## Documentation
 
 - [User guide](docs/juli11_user_guide_zh.md)
-- [Development report](docs/juli12_development_report_zh.md)
-- [Printable report](docs/juli12_development_report_zh.pdf)
-- [HTML report](docs/juli12_development_report_zh.html)
+- [Development report](docs/酒店停车场管理系统开发报告与使用说明.md)
+- [Printable report](docs/酒店停车场管理系统开发报告与使用说明.pdf)
+- [HTML report](docs/酒店停车场管理系统开发报告与使用说明.html)
 - [Demo checklist](docs/juli13_demo_script_and_checklist_zh.md)
 - [Historical viewing guide](docs/juli14_viewing_guide_and_alignment_zh.md)
 

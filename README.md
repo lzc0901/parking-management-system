@@ -60,7 +60,7 @@ The tool directory `.multica/`, videos in `docs/demo/` and the assignment in
 retain their original bytes and describe their original execution environment.
 
 - [User guide](docs/juli11_user_guide_zh.md)
-- [Development report](docs/juli12_development_report_zh.md) ([HTML](docs/juli12_development_report_zh.html), [PDF](docs/juli12_development_report_zh.pdf))
+- [Development report](docs/酒店停车场管理系统开发报告与使用说明.md) ([HTML](docs/酒店停车场管理系统开发报告与使用说明.html), [PDF](docs/酒店停车场管理系统开发报告与使用说明.pdf))
 - [Demo script](docs/juli13_demo_script_and_checklist_zh.md)
 - [Viewing guide](docs/juli14_viewing_guide_and_alignment_zh.md)
 

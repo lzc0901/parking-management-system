@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>酒店停车场管理系统：开发报告与使用说明</title>
+<style>
+  @page {
+    size: A4;
+    margin: 12.5mm 13mm 12.5mm 13mm;
+  }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 9.7pt;
+    line-height: 1.46;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 18pt;
+    color: #1e3a8a;
+    border-bottom: 2.5px solid #1e3a8a;
+    padding-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 9px;
+  }
+  h2 {
+    font-size: 13.5pt;
+    color: #1e3a8a;
+    background: #eff6ff;
+    border-left: 4px solid #1d4ed8;
+    padding: 5px 10px;
+    margin-top: 14px;
+    margin-bottom: 7px;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 11.2pt;
+    color: #0f172a;
+    margin-top: 11px;
+    margin-bottom: 5px;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 10.2pt;
+    color: #1e3a8a;
+    margin-top: 9px;
+    margin-bottom: 4px;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  p, li {
+    margin-top: 3px;
+    margin-bottom: 5px;
+  }
+  ul, ol {
+    padding-left: 20px;
+    margin-top: 3px;
+    margin-bottom: 5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 7px 0 10px 0;
+    font-size: 8.9pt;
+    page-break-inside: auto;
+  }
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #94a3b8;
+    padding: 5px 7px;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: break-word;
+  }
+  th {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+    font-weight: bold;
+  }
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8.6pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 7px 10px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    font-size: 8.4pt;
+    line-height: 1.4;
+    margin: 6px 0 10px 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    word-break: normal;
+  }
+  blockquote {
+    margin: 8px 0;
+    padding: 6px 12px;
+    background: #fefce8;
+    border-left: 4px solid #eab308;
+    font-size: 9.4pt;
+    break-inside: avoid;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 175mm;
+    width: auto;
+    height: auto;
+    margin: 8px auto 10px auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #cbd5e1;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<h1>酒店停车场管理系统：开发报告与使用说明</h1>
+<p><strong>课程名称</strong>：高级编程与软件工程（期末项目）<br />
+<strong>项目名称</strong>：澳门本地酒店停车场管理系统（C++17 控制台版本）<br />
+<strong>开发语言与环境</strong>：C++17 标准库（控制台界面与本机 UTF-8 文件持久化）</p>
+<hr />
+<h2>小组成员与分工</h2>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">小组成员姓名</th>
+  <th style="text-align:left">学号</th>
+  <th style="text-align:left">主要分工</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left">（请填写姓名）</td>
+  <td style="text-align:left">（请填写学号）</td>
+  <td style="text-align:left">汽车信息模块开发、计费算法与本机文件存储设计</td>
+</tr>
+<tr>
+  <td style="text-align:left">（请填写姓名）</td>
+  <td style="text-align:left">（请填写学号）</td>
+  <td style="text-align:left">普通用户模块、管理员用户模块与控制台菜单交互实现</td>
+</tr>
+<tr>
+  <td style="text-align:left">（请填写姓名）</td>
+  <td style="text-align:left">（请填写学号）</td>
+  <td style="text-align:left">系统功能验证、全流程操作演示与开发报告编写</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>第一章　项目背景与功能需求</h2>
+<p>澳门本地某酒店需要一套简单可靠的停车场管理工具，让前线工作人员及管理人员在日常工作中记录进出车辆、查询停放时长与应收费用，并在程序关闭重新开启后保留在场车辆数据。考量酒店前台与测试环境多以桌面终端执行，系统采用 <strong>C++17 标准库</strong> 开发控制台应用程序，无需额外安装数据库或图形界面软件包即可独立编译与执行。</p>
+<p>对照课程作业任务书的要求，本系统实作三个核心必做模块，并作出清楚的功能范围界定：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">课程必做模块</th>
+  <th style="text-align:left">作业要求重点</th>
+  <th style="text-align:left">本系统实现内容与设计选择</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong>1.1 汽车信息模块</strong></td>
+  <td style="text-align:left">添加车牌、品类、颜色与停车时间点；按车牌显示、删除、查找、修改信息；统计停留时长与车辆总数；保存数据至本机文件。</td>
+  <td style="text-align:left">采用<strong>手动输入车牌号</strong>（不引入可选的 OpenCV 图像识别）；提供严格的字段与 <code>YYYY-MM-DD HH:MM</code> 时间校验；以 <code>X days Y hours Z minutes</code> 显示停留时长并统计 <code>Current count</code>；数据以 UTF-8 Tab 分隔格式保存于工作目录下的 <code>parking_data.txt</code>。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.2 普通用户模块</strong></td>
+  <td style="text-align:left">查询及显示所有汽车信息与停车费（例如每小时 20 MOP、超过 24 小时按 400 MOP 计算）；统计停车时长；退出普通用户登录。</td>
+  <td style="text-align:left">提供只读会话（<code>1 = list</code>、<code>2 = find</code>、<code>3 = count</code>、<code>0 = logout</code>）；计费采用「每开始 1 小时 20 MOP、每个连续 24 小时周期封顶 400 MOP」的分段累计规则；界面与底层类型双重限制普通用户不得执行任何增删改操作。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>1.3 管理员用户模块</strong></td>
+  <td style="text-align:left">具备普通用户模块的全部功能，并提供增、删、改功能。</td>
+  <td style="text-align:left">在共享查询功能（<code>1–3</code>）之外，提供 <code>4 = add</code>（新增）、<code>5 = modify</code>（修改）、<code>6 = delete</code>（删除）及 <code>0 = logout</code>（退出登录）；每次写入成功后立即保存至本机文件。</td>
+</tr>
+</tbody>
+</table>
+<p>在权限与数据流方面，程序启动后透过主菜单切换角色（<code>1 = ordinary</code> 普通用户、<code>2 = administrator</code> 管理员、<code>0 = exit</code> 离开），两种角色登录后皆可随时以 <code>0 = logout</code> 退出登录并回到主菜单。为保持核心业务逻辑清晰且易于评审验证，系统不包含账号密码注册子系统、车位容量上限拦截或历史离场归档表。</p>
+<hr />
+<h2>第二章　系统整体设计</h2>
+<h3>2.1 整体运行流程与模块协作</h3>
+<p>程序启动后，会先向本机数据文件载入先前保存的车辆记录，再进入控制台菜单循环，最后于退出时确认数据已妥善落盘。整体控制流程如下图所示：</p>
+<p><img src="./diagrams/juli12_flowchart_1_overall.svg" alt="图 1：系统整体流程" /></p>
+<p>配合图 1 的执行顺序，系统依职责分开建立为四层独立的 <code>.h</code> 与 <code>.cpp</code> 文件，让界面输出、权限控制、计费规则与文件读写互不混杂：</p>
+<ol>
+<li><strong>程序入口与生命周期（<code>src/main.cpp</code>）</strong>：启动时建立 <code>ParkingService</code>（内存业务服务）与 <code>Storage</code>（文件存储器），先呼叫 <code>storage.Load(service)</code> 载入本机数据。若既有文件损坏或无法读取，立即印出错误原因并以状态码 <code>1</code> 结束程序，避免启动后覆盖原有数据；载入成功后呼叫 <code>RunMenu()</code> 进入菜单循环，结束前再呼叫 <code>storage.Save(service)</code> 并依结果返回 <code>0</code> 或 <code>1</code>。</li>
+<li><strong>菜单路由与角色隔离（<code>src/menus.h/.cpp</code>、<code>src/ordinary_user.h/.cpp</code>、<code>src/admin_user.h/.cpp</code>）</strong>：<ul>
+<li><code>RunMenu()</code> 负责显示计费规则横幅并处理顶层角色选择。</li>
+<li><code>RunOrdinaryUserSession()</code> 只接收只读参考 <code>const ParkingService&amp;</code>，且不持有 <code>Storage</code> 物件，从编译期即保证普通用户只能呼叫 <code>RunReadChoice()</code> 执行 <code>1 = list</code>、<code>2 = find</code>、<code>3 = count</code>。</li>
+<li><code>RunAdminUserSession()</code> 接收可写的 <code>ParkingService&amp;</code> 与 <code>Storage&amp;</code>，除可执行共享查询（<code>1–3</code>）外，还可处理 <code>4 = add</code>、<code>5 = modify</code>、<code>6 = delete</code> 并在每次成功修改后即时保存。</li>
+</ul>
+</li>
+<li><strong>车辆数据管理与校验（<code>src/vehicle.h/.cpp</code>、<code>src/parking_service.h/.cpp</code>）</strong>：统一对输入字串去空白与禁用控制字元、解析与检查日期时间，并将所有在场车辆集中管理于 <code>ParkingService</code>，由服务层检查 <code>Role::kAdmin</code> 权限与车牌唯一性。</li>
+<li><strong>计费计算与本机持久化（<code>src/fee_calculator.h/.cpp</code>、<code>src/storage.h/.cpp</code>）</strong>：<code>CalculateParkingFee()</code> 纯粹根据入场时间与基准时间计算时长与金额；<code>Storage</code> 则透过临时文件与备份文件机制保障读写安全。</li>
+</ol>
+<h3>2.2 一笔车辆数据的结构与流转</h3>
+<p>以一笔实际停放记录为例：当管理员输入车牌 <code>MA-10-01</code>、品类 <code>轿车</code>、颜色 <code>黑色</code> 及入场时间 <code>2026-11-01 08:00</code> 时，系统会将它封装为 <code>VehicleRecord</code>（定义于 <code>src/vehicle.h</code>）：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">字段名称</th>
+  <th style="text-align:left">范例值</th>
+  <th style="text-align:left">字段用途与设计说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><code>plate</code></td>
+  <td style="text-align:left"><code>&quot;MA-10-01&quot;</code></td>
+  <td style="text-align:left"><strong>车牌号</strong>，去除首尾空格且禁止内部出现空格，作为系统内的唯一识别键。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>category</code></td>
+  <td style="text-align:left"><code>&quot;轿车&quot;</code></td>
+  <td style="text-align:left"><strong>汽车品类</strong>，支持中英文与合理内部空格（如 <code>SUV</code>、<code>Model Y</code>）。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>color</code></td>
+  <td style="text-align:left"><code>&quot;黑色&quot;</code></td>
+  <td style="text-align:left"><strong>汽车颜色</strong>，支持中英文与常见颜色描述。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>entry_time_text</code></td>
+  <td style="text-align:left"><code>&quot;2026-11-01 08:00&quot;</code></td>
+  <td style="text-align:left"><strong>标准化入场时间文字</strong>，严格采用 16 字元 <code>YYYY-MM-DD HH:MM</code> 24 小时制格式。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>entry_timestamp</code></td>
+  <td style="text-align:left">（本地整分钟时间戳）</td>
+  <td style="text-align:left"><strong>内部派生时间戳</strong>，于校验通过时由 <code>ParseTimestamp()</code> 转成秒数设为 <code>0</code> 的 <code>std::time_t</code>，供后续计费直接相减，避免每次查询重复解析字串。</td>
+</tr>
+</tbody>
+</table>
+<p>在内存数据结构选型上，<code>ParkingService</code> 使用 <code>std::map&lt;std::string, VehicleRecord&gt;</code> 以 <code>plate</code> 作为键值（Key）储存全部在场车辆，原因有三点：</p>
+<ul>
+<li><strong>天然确保车牌唯一</strong>：每次查找、修改或删除都只需按车牌键进行 <code>O(log N)</code> 查询，并能立即拦截重复车牌。</li>
+<li><strong>输出与存档顺序确定</strong>：红黑树依车牌字典序升序排列，无论执行 <code>1 = list</code> 显示列表还是写入 <code>parking_data.txt</code>，结果顺序都固定一致，便于人工核对与重复验证。</li>
+<li><strong>逻辑与储存解耦</strong>：业务层不依赖阵列下标，即使中途删除或修改车牌名称，也不会影响其他车辆的索引。</li>
+</ul>
+<p>当用户查询车辆时，<code>ParkingService</code> 从 <code>std::map</code> 取出 <code>VehicleRecord</code>，交由计费模块算出 <code>ParkingFee</code> 并组合成 <code>VehicleFeeView</code> 交还控制台输出；当管理员变更数据时，则把整个有序集合交给 <code>Storage</code> 依车牌顺序写入 <code>parking_data.txt</code>。</p>
+<hr />
+<h2>第三章　核心功能的开发逻辑</h2>
+<h3>3.1 车辆数据变更（新增、修改与删除）</h3>
+<p>管理员的数据异动（<code>4 = add</code>、<code>5 = modify</code>、<code>6 = delete</code>）由交互层收集输入后交给业务服务层集中校验，确认通过后才更新内存并立即尝试存档。其核心流程如下：</p>
+<p><img src="./diagrams/juli12_flowchart_2_crud.svg" alt="图 2：管理员新增、修改与删除流程" /></p>
+<p>三种写入操作在输入顺序与检查重点上有所差异，整理如下表：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">菜单操作</th>
+  <th style="text-align:left">输入顺序</th>
+  <th style="text-align:left">校验与查找重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong><code>4</code> 新增（<code>AddVehicle</code>）</strong></td>
+  <td style="text-align:left">直接依序输入 <code>Plate</code>、<code>Category</code>、<code>Color</code>、<code>Entry time</code></td>
+  <td style="text-align:left">检查四个字段与时间合法性（含非未来时间），且目标车牌不可已存在。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong><code>5</code> 修改（<code>ModifyVehicle</code>）</strong></td>
+  <td style="text-align:left">先输入原车牌 <code>Existing plate</code>，再输入新的四项数据</td>
+  <td style="text-align:left">先确认原车牌格式合法且存在于场内；再检查新四项数据合法；若车牌有更名，新车牌不可与场内其他车辆冲突。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong><code>6</code> 删除（<code>DeleteVehicle</code>）</strong></td>
+  <td style="text-align:left">只需输入目标原车牌 <code>Existing plate</code></td>
+  <td style="text-align:left">检查车牌格式合法且存在于场内，符合即从内存集合中移除。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>开发逻辑说明（对应 <code>src/admin_user.cpp</code>、<code>src/parking_service.cpp</code>、<code>src/vehicle.cpp</code>）</strong>：</p>
+<ol>
+<li><strong>三层输入校验（<code>Validated</code>）</strong>：<ul>
+<li><code>NormalizeField()</code> 会先拒绝 ASCII 控制字元（例如 Tab <code>\t</code> 或换行），再裁剪首尾半角空格并拒绝空字串；对车牌字段额外禁止任何内部空格（例如 <code>&quot;MA 12&quot;</code> 会被拒绝，<code>&quot;MA-10-01&quot;</code> 才合法）。</li>
+<li><code>ParseTimestamp()</code> 检查 <code>YYYY-MM-DD HH:MM</code> 的 16 字元固定格式与数字范围，依公历月份天数与闰年规则（如平年拒绝 <code>2026-02-29</code>、闰年接受 <code>2024-02-29</code>）判断后，再以 <code>std::mktime()</code> 做往返校验确保日期未发生进位溢出。</li>
+<li><code>NormalizeToMinute()</code> 将系统当前基准时间对齐至整分钟，若入场时间晚于当前分钟便返回 <code>VehicleResult::kFutureTime</code>（提示 <code>Entry time is in the future.</code>）。</li>
+</ul>
+</li>
+<li><strong>两种失败情境的明确区分</strong>：<ul>
+<li><strong>校验失败（记录未变）</strong>：无论是字段非法、未来时间、找不到原车牌，或是新增/改名发生车牌冲突，业务层都会在修改 <code>records_</code> 之前提前返回错误码（<code>kInvalidField</code>、<code>kInvalidTime</code>、<code>kFutureTime</code>、<code>kNotFound</code>、<code>kDuplicatePlate</code>），原有车辆记录完整保留，且不会触发存档。</li>
+<li><strong>记录已更新但保存失败</strong>：只有当内存更新成功后，<code>RunAdminUserSession()</code> 才会呼叫 <code>storage.Save(service)</code>。若成功，输出 <code>Updated and saved. Parking data saved.</code>；若因目录权限或磁盘问题导致存档失败，系统不会谎报成功，而是印出警告 <code>Updated in memory, but save failed: &lt;reason&gt;</code>，明确告知管理员变更目前仅存于内存中。</li>
+</ul>
+</li>
+</ol>
+<p><strong>具体例子</strong>：假设场内已有 <code>MA-10-01</code>（<code>轿车</code>、<code>黑色</code>、<code>2026-11-01 08:00</code>）。若管理员执行 <code>5 = modify</code> 想把颜色改为 <code>香槟金</code> 但不小心将车牌误填为已存在的 <code>MB-20-02</code>，系统会在唯一性检查阶段拦截并输出 <code>Plate already exists.</code>，原本的 <code>MA-10-01</code> 数据丝毫不受影响；若正确维持 <code>MA-10-01</code> 并改色为 <code>香槟金</code>，内存会先替换该笔记录，接著立即写入 <code>parking_data.txt</code> 完成落盘。</p>
+<hr />
+<h3>3.2 停车时长与费用计算</h3>
+<p>停车时长统计与费用计算是普通用户与管理员日常查询的核心逻辑，其计算流程如下：</p>
+<p><img src="./diagrams/juli12_flowchart_3_fee.svg" alt="图 3：停车时长与费用计算流程" /></p>
+<p><strong>开发逻辑说明（对应 <code>src/fee_calculator.h/.cpp</code>、<code>src/parking_service.cpp</code>）</strong>：</p>
+<ol>
+<li><strong>整分钟对齐与统一基准时间</strong>：<code>CalculateParkingFee(entry, reference, result)</code> 不直接读取系统全域时钟，而是接受呼叫端传入的 <code>reference</code> 时间戳；并且在执行 <code>ListWithFees()</code> 显示整张列表时，程序只会取一次当前时间并对齐至整分钟（将 <code>tm_sec</code> 设为 <code>0</code>），确保同一份清单内所有车辆都站在完全相同的时间基准上，不会因为程序回圈跑到一半刚好跨过秒数边界而产生误差。</li>
+<li><strong>负时长与异常防护</strong>：利用 <code>std::difftime(end, start)</code> 算出秒数差后，若秒数小于 <code>0</code>（查询基准早于入场时间）或超出安全整数上限，函式直接返回 <code>false</code> 且不改动输出结构体，由界面层提示错误而非印出负数费用。</li>
+<li><strong>分段封顶计算公式</strong>：<ul>
+<li>总停留分钟数：<code>total_minutes = seconds / 60</code></li>
+<li>完整 24 小时天数：<code>days = total_minutes / 1440</code>，每天固定收费 <code>400 MOP</code>。</li>
+<li>剩余分钟数：<code>remainder = total_minutes % 1440</code>，转换成显示用小时 <code>hours = remainder / 60</code> 与分钟 <code>minutes = remainder % 60</code>。</li>
+<li>剩余部分计费小时数（不足 1 小时按 1 小时计算）：<code>started_hours = (remainder + 59) / 60</code>，并套用单一 24 小时周期最高 <code>400 MOP</code> 封顶：<code>partial = min(400, started_hours * 20)</code>。</li>
+<li>总费用：<code>mop = days * 400 + partial</code>。</li>
+</ul>
+</li>
+</ol>
+<p><strong>典型边界例子</strong>：</p>
+<ul>
+<li><strong>停留 <code>0</code> 分钟</strong>：<code>0 days 0 hours 0 minutes</code> → <code>0 MOP</code>（同一分钟内入场即查询不收费）。</li>
+<li><strong>停留 <code>60</code> 分钟（整 1 小时）</strong>：<code>started_hours = (60 + 59) / 60 = 1</code> → <code>1 × 20 = 20 MOP</code>。</li>
+<li><strong>停留 <code>61</code> 分钟（刚超过 1 小时）</strong>：<code>started_hours = (61 + 59) / 60 = 2</code> → <code>2 × 20 = 40 MOP</code>。</li>
+<li><strong>停留 <code>20</code> 至 <code>24</code> 小时（如 <code>1440</code> 分钟）</strong>：第 1 个 24 小时周期触发单日封顶 → <code>400 MOP</code>（显示为 <code>1 days 0 hours 0 minutes</code>）。</li>
+<li><strong>停留 <code>24</code> 小时 <code>1</code> 分钟（<code>1441</code> 分钟）</strong>：拆为 1 个完整周期（<code>400 MOP</code>）加上第 2 周期剩余 <code>1</code> 分钟（进位 1 小时 <code>20 MOP</code>）→ 合计 <strong><code>420 MOP</code></strong>（显示为 <code>1 days 0 hours 1 minutes</code>）。</li>
+</ul>
+<hr />
+<h3>3.3 文件保存与恢复</h3>
+<p>为防止程序在写入文件过程中因磁盘失败或异常中断而同时毁损旧数据，系统在 <code>Storage::Save()</code> 中设计了「先写临时文件 → 再备份旧文件 → 最后替换主文件」的保护流程：</p>
+<p><img src="./diagrams/juli12_flowchart_4_storage.svg" alt="图 4：文件保存与恢复流程" /></p>
+<p><strong>启动载入、备份恢复与错误分支说明（对应 <code>src/storage.h/.cpp</code>）</strong>：</p>
+<ol>
+<li><strong>首次执行与空车库启动（<code>Storage::Load</code>）</strong>：程序启动时会先预设写入锁定旗标 <code>blocked_ = true</code>。若工作目录下同时找不到 <code>parking_data.txt</code> 与 <code>parking_data.txt.bak</code>，代表首次执行，系统会初始化为空车库、解除锁定（<code>blocked_ = false</code>），并输出 <code>First run: no parking data file.</code>。</li>
+<li><strong>主文件缺失时的自动备份恢复</strong>：若上次写入文件在「旧文件已改名为 <code>.bak</code>、但新文件尚未完成替换」之间中断，下一次启动时会检测到主文件缺失但 <code>.bak</code> 存在。此时 <code>Load()</code> 会先用 <code>ParseFile()</code> 完整解析并验证 <code>.bak</code> 内容；验证通过后将 <code>.bak</code> 重新命名恢复为 <code>parking_data.txt</code>，解锁写入并输出 <code>Recovered parking data from parking_data.txt.bak.</code>。</li>
+<li><strong>全有或全无（All-or-Nothing）解析与安全锁定</strong>：<code>ParseFile()</code> 逐行读取 <code># PARKING_SYSTEM_V1</code> 后的 4 栏 Tab 分隔数据，若任何一行格式错误、时间不合法或出现重复车牌，立即中止并返回精确行号（如 <code>Line 3: expected four tab-separated fields.</code>），保持原有内存状态不变且维持 <code>blocked_ = true</code> 拒绝后续保存，避免在错误状态下把原文件覆盖掉。</li>
+<li><strong>保存阶段的细部防错分支</strong>：<ul>
+<li>在把原 <code>parking_data.txt</code> 改名为 <code>.bak</code> 之前，<code>Save()</code> 会再次检查磁盘上的既有 <code>parking_data.txt</code> 是否已被外部手动改坏；若发现已损坏，同样设 <code>blocked_ = true</code>、移除 <code>.tmp</code> 并中止写入。</li>
+<li>若原主文件不存在却发现残留 <code>.bak</code>（代表前一次异常未处理），系统也会锁定保存并要求先重启恢复。</li>
+<li>若将 <code>.tmp</code> 改名为 <code>parking_data.txt</code> 时发生系统错误，程序会立即尝试将 <code>.bak</code> 改名复原回主文件；若连复原也失败，则保留 <code>.bak</code>、锁定后续写入并提示 <code>Replacement and rollback failed; preserve backup ...</code>。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>第四章　可优化的逻辑与程序码</h2>
+<p>以下讨论均为针对现行设计的<strong>优化建议</strong>，旨在梳理程序可进一步精进的方向，现行课程提交版本保持既有行为不作更动。</p>
+<h3>4.1 建议一：减少不必要的退出重写（追踪待保存状态）</h3>
+<ul>
+<li><strong>现有做法</strong>：在管理员会话中，每次执行新增、修改或删除成功后，<code>RunAdminUserSession()</code> 已立即呼叫 <code>storage.Save(service)</code>（<code>src/admin_user.cpp:86</code>）；但当使用者离开顶层菜单时，<code>main()</code> 结束前仍会无条件再次呼叫一次 <code>storage.Save(service)</code>（<code>src/main.cpp:26</code>）。</li>
+<li><strong>具体问题</strong>：若本次执行只是普通用户登录查询，或是管理员进行修改后皆已即时存档成功，内存中的数据早已与磁盘同步；退出时仍重新执行整套校验、写 <code>.tmp</code>、备份与替换主文件，会带来不必要的磁盘 I/O 与文件名替换操作。</li>
+<li><strong>改法与取舍</strong>：可在 <code>ParkingService</code> 或主流程维护一个待保存旗标 <code>dirty_</code>：初始为 <code>false</code>，当 <code>AddVehicle</code>、<code>ModifyVehicle</code>、<code>DeleteVehicle</code> 成功更动内存时设为 <code>true</code>，当 <code>Storage::Save()</code> 成功完成落盘后重设为 <code>false</code>；程序退出时仅在 <code>dirty_ == true</code> 时执行最终保存。取舍在于必须谨慎确保所有变更内存的路径都不会遗漏标记 <code>dirty_ = true</code>（以及保存失败时维持 <code>true</code> 以便退出重试），优点是纯查询会话退出时可完全避免写入文件。</li>
+<li><strong>如何验证</strong>：分别执行「只做普通用户查询后退出」、「管理员新增成功并显示 <code>Parking data saved.</code> 后退出」、以及「模拟即时保存失败后再退出」三种情境，比对退出讯息与 <code>parking_data.txt</code> 的最后修改时间戳。</li>
+</ul>
+<h3>4.2 建议二：减少保存时的重复校验与整表复制</h3>
+<ul>
+<li><strong>现有做法</strong>：在 <code>Storage::Save()</code> 中（<code>src/storage.cpp:108-116</code>），每次存档会先把 <code>service.ListAll()</code> 逐笔重新呼叫 <code>ParseTimestamp()</code> 并插入一个全新的临时 <code>ParkingService checked</code> 红黑树；此外，当目标档已存在时（<code>src/storage.cpp:137-144</code>），还会呼叫 <code>ParseFile(path_, current)</code> 读取并解析磁盘上的旧文件。</li>
+<li><strong>具体问题</strong>：所有公开写入界面（<code>AddVehicle</code>、<code>ModifyVehicle</code>）在写入 <code>records_</code> 前已强制通过 <code>Validated()</code> 检查，因此建立第二棵临时 <code>ParkingService checked</code> 属于重复配置内存与重复建树（<code>O(N log N)</code> 开销）。若未来车库记录累积至数万笔以上，频繁保存会产生显著的重复计算与文件重读成本。</li>
+<li><strong>改法与取舍</strong>：建议先针对预期数据量实测单次 <code>Save()</code> 耗时与确认现行校验覆盖度；若确认收益明确，可将 <code>ParkingService checked</code> 替换为对 <code>service.ListAll()</code> 做单次线性扫描的轻量防御检查（直接验证字段无控制字元与时间戳一致，不另外配置 <code>std::map</code>），就能省下约一半的内存分配与树插入成本；至于写入文件前重读旧文件 <code>ParseFile()</code> 的保护，则可视需求保留（防外部误改）或改以较轻量的检查取代。取舍是简化二次建树后，必须由单元测试持续保证 <code>ParkingService</code> 没有任何未经校验的写入漏洞。</li>
+<li><strong>如何验证</strong>：准备 100 笔、1,000 笔与 10,000 笔模拟车辆记录，实测优化前后呼叫 <code>Storage::Save()</code> 的平均耗时，并确认既有的持久化与畸形数据拒写测试依然全部通过。</li>
+</ul>
+<h3>4.3 建议三：降低管理员删除操作的误删风险</h3>
+<ul>
+<li><strong>现有做法</strong>：在 <code>RunAdminUserSession()</code> 中（<code>src/admin_user.cpp:70-86</code>），管理员输入 <code>6</code> 并填写 <code>Existing plate: </code> 后，程序会直接呼叫 <code>service.DeleteVehicle(Role::kAdmin, plate)</code> 移除该车数据并立即写回磁盘，中间没有任何确认提示。</li>
+<li><strong>具体问题</strong>：当车牌相近时（例如场内同时停有 <code>MA-10-01</code> 与 <code>MA-10-10</code>），管理员一旦手误输入错误车牌并按 Enter，记录会立刻被删除且同步覆盖 <code>parking_data.txt</code>，在没有离场归档表的情况下无法于系统内直接撤销。</li>
+<li><strong>改法与取舍</strong>：在 <code>choice == &quot;6&quot;</code> 读入 <code>Existing plate</code> 后，可先呼叫 <code>service.FindByPlate(plate)</code>：若车牌格式无效或找不到车辆，直接输出提示并返回菜单；若找到匹配车辆，先印出该车的车牌、品类、颜色与入场时间，再提示 <code>Confirm delete? (y/n): </code>，只有管理员输入 <code>y</code> 或 <code>Y</code> 时才执行 <code>DeleteVehicle()</code> 与 <code>Storage::Save()</code>。取舍是多了一次键盘确认步骤（现有自动化输入脚本与演示步骤需同步补上 <code>y</code>），但能大幅降低人工操作误删数据的风险。</li>
+<li><strong>如何验证</strong>：设计三个互动验证情境——(1) 输入不存在车牌，应直接输出 <code>Vehicle not found.</code> 而不出现确认提示；(2) 找到车辆后输入 <code>n</code> 取消，确认 <code>Current count</code> 与车牌数据维持不变；(3) 找到车辆后输入 <code>y</code> 确认，确认车辆自列表移除且重启后不再出现。</li>
+</ul>
+<hr />
+<h2>第五章　系统使用说明与操作验证</h2>
+<h3>5.1 环境准备、编译与启动方式</h3>
+<p>本系统支持在 <strong>Windows PowerShell</strong> 下直接执行预编译执行档，或使用任意支持 <strong>C++17</strong> 的编译器（如 <code>g++</code> / <code>clang++</code>）从原始码编译运行：</p>
+<ol>
+<li><strong>设定终端 UTF-8 编码（建议于 Windows PowerShell 执行，确保中文品类与颜色正确输入及显示）</strong>：<pre><code class="language-powershell">[Console]::InputEncoding  = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding           = [System.Text.UTF8Encoding]::new($false)
+</code></pre>
+</li>
+<li><strong>方式一：直接启动预编译程序（Windows 64 位元）</strong>：
+在具备写入权限的工作目录（例如项目根目录或独立测试数据夹）下执行：<pre><code class="language-powershell">./bin/parking.exe
+</code></pre>
+</li>
+<li><strong>方式二：从 C++17 原始码编译并启动</strong>：
+在项目根目录执行以下命令：<pre><code class="language-powershell">New-Item -ItemType Directory -Force build | Out-Null
+g++ -std=c++17 -Wall -Wextra -pedantic -I. -Isrc src/*.cpp -o build/parking.exe
+./build/parking.exe
+</code></pre>
+</li>
+</ol>
+<blockquote>
+<p><strong>数据文件路径说明</strong>：程序会在<strong>执行时的当前工作目录</strong>读取与建立 <code>parking_data.txt</code>（保存过程会短暂产生 <code>parking_data.txt.tmp</code> 与 <code>parking_data.txt.bak</code>）。建议在独立空白目录中执行验证，避免与其他测试数据混放。</p>
+</blockquote>
+<hr />
+<h3>5.2 角色与菜单速查表</h3>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">菜单层级</th>
+  <th style="text-align:left">提示文字</th>
+  <th style="text-align:left">可选编号与对应功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><strong>顶层主菜单</strong></td>
+  <td style="text-align:left"><code>Parking system: 1 = ordinary, 2 = administrator, 0 = exit</code></td>
+  <td style="text-align:left"><code>1</code> 进入普通用户会话｜<code>2</code> 进入管理员会话｜<code>0</code> 保存并退出程序</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>普通用户菜单</strong></td>
+  <td style="text-align:left"><code>Ordinary user session: 1 = list, 2 = find, 3 = count, 0 = logout</code></td>
+  <td style="text-align:left"><code>1</code> 显示全部车辆与费用｜<code>2</code> 按车牌查找｜<code>3</code> 查看车辆总数｜<code>0</code> 退出登录回主菜单</td>
+</tr>
+<tr>
+  <td style="text-align:left"><strong>管理员菜单</strong></td>
+  <td style="text-align:left"><code>Administrator session: 1 = list, 2 = find, 3 = count, 4 = add, 5 = modify, 6 = delete, 0 = logout</code></td>
+  <td style="text-align:left"><code>1–3</code> 同普通用户查询｜<code>4</code> 新增车辆｜<code>5</code> 修改车辆｜<code>6</code> 删除车辆｜<code>0</code> 退出登录回主菜单</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5.3 完整操作验证案例（同一组车牌贯穿全流程）</h3>
+<p>以下操作案例以一组虚构澳门车牌（<code>MA-10-01</code>、<code>MB-20-02</code>、<code>MC-30-03</code>）为例，在全新空白目录下依序验证三个必做模块、收费规则边界与重启持久化。由于程序会以 <strong>执行当下的电脑时间（对齐整分钟）</strong> 计算停留时长，建议在演练前设定三个相对入场时间（例如目前为 <code>18:30</code>，则 <code>60 分钟前</code> 为当天 <code>17:30</code>、<code>61 分钟前</code> 为当天 <code>17:29</code>、<code>24 小时 1 分钟前</code> 为前一天 <code>18:29</code>），即可即时观察到三种典型计费边界：</p>
+<h4>第一阶段：空车库检查与管理员新增（<code>MA-10-01</code>、<code>MB-20-02</code>、<code>MC-30-03</code>）</h4>
+<ol>
+<li><strong>启动程序</strong>：在空白目录执行 <code>./bin/parking.exe</code>，首行显示 <code>First run: no parking data file.</code> 与收费标准横幅，并进入主菜单。</li>
+<li><strong>普通用户空库与权限检查</strong>：<ul>
+<li>输入 <code>1</code> 进入普通用户 → 输入 <code>1</code>（<code>list</code>），输出 <code>No vehicles.</code> 与 <code>Current count: 0</code>。</li>
+<li>尝试输入管理员选项 <code>4</code>，系统拒绝并输出 <code>Invalid choice.</code>。</li>
+<li>输入 <code>0</code> 退出登录回到主菜单。</li>
+</ul>
+</li>
+<li><strong>管理员登录并新增三辆车</strong>：输入 <code>2</code> 进入管理员菜单，依序执行三次 <code>4</code>（<code>add</code>）：<ul>
+<li><strong>第 1 辆</strong>（60 分钟前）：<code>Plate: MA-10-01</code> / <code>Category: 轿车</code> / <code>Color: 黑色</code> / <code>Entry time: &lt;60 分钟前时间&gt;</code> → 输出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong>第 2 辆</strong>（61 分钟前）：<code>Plate: MB-20-02</code> / <code>Category: SUV</code> / <code>Color: 白色</code> / <code>Entry time: &lt;61 分钟前时间&gt;</code> → 输出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong>第 3 辆</strong>（24 小时 1 分钟前）：<code>Plate: MC-30-03</code> / <code>Category: MPV</code> / <code>Color: 银色</code> / <code>Entry time: &lt;24 小时 1 分钟前时间&gt;</code> → 输出 <code>Updated and saved. Parking data saved.</code>。</li>
+</ul>
+</li>
+<li>输入 <code>0</code> 退出登录管理员会话。</li>
+</ol>
+<h4>第二阶段：普通用户查询列表、单车查找与总数统计</h4>
+<p>在主菜单输入 <code>1</code> 进入普通用户会话，依序验证查询功能：</p>
+<ul>
+<li><strong>输入 <code>1</code>（<code>list</code>）</strong>：依车牌升序显示三辆车的完整信息、时长与费用，以及 <code>Current count: 3</code>：<pre><code class="language-text">Plate: MA-10-01 | Category: 轿车 | Color: 黑色 | Entry: 2026-11-18 17:30 | Duration: 0 days 1 hours 0 minutes | Fee: 20 MOP
+Plate: MB-20-02 | Category: SUV | Color: 白色 | Entry: 2026-11-18 17:29 | Duration: 0 days 1 hours 1 minutes | Fee: 40 MOP
+Plate: MC-30-03 | Category: MPV | Color: 银色 | Entry: 2026-11-17 18:29 | Duration: 1 days 0 hours 1 minutes | Fee: 420 MOP
+Current count: 3
+</code></pre>
+</li>
+<li><strong>输入 <code>2</code>（<code>find</code> 命中）</strong>：于 <code>Plate: </code> 输入 <code>MA-10-01</code>，输出该车详情及 <code>Current count: 3</code>。</li>
+<li><strong>输入 <code>2</code>（<code>find</code> 未命中）</strong>：于 <code>Plate: </code> 输入 <code>MZ-99-99</code>，输出 <code>Vehicle not found.</code> 及 <code>Current count: 3</code>。</li>
+<li><strong>输入 <code>3</code>（<code>count</code>）</strong>：输出 <code>Current count: 3</code>。</li>
+<li><strong>输入 <code>0</code>（<code>logout</code>）</strong>：返回主菜单。</li>
+</ul>
+<h4>第三阶段：管理员修改与删除、退出并重启核对</h4>
+<ol>
+<li><strong>管理员修改与删除</strong>：输入 <code>2</code> 进入管理员会话：<ul>
+<li><strong>输入 <code>5</code>（<code>modify</code>）</strong>：先于 <code>Existing plate: </code> 输入 <code>MA-10-01</code>，再输入 <code>Plate: MA-10-01</code>、<code>Category: 轿车</code>、<code>Color: 香槟金</code>、<code>Entry time: &lt;原入场时间&gt;</code> → 输出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong>输入 <code>6</code>（<code>delete</code>）</strong>：于 <code>Existing plate: </code> 输入 <code>MB-20-02</code> → 输出 <code>Updated and saved. Parking data saved.</code>。</li>
+<li><strong>输入 <code>0</code>（<code>logout</code>）</strong> 回到主菜单，再输入 <strong><code>0</code>（<code>exit</code>）</strong> 结束程序，输出 <code>Parking data saved.</code>。</li>
+</ul>
+</li>
+<li><strong>重启程序核对持久化结果</strong>：在同一个目录再次启动 <code>./bin/parking.exe</code>：<ul>
+<li>启动首行显示 <code>Loaded parking_data.txt.</code>。</li>
+<li>进入普通用户（<code>1</code>）执行 <code>1</code>（<code>list</code>）与 <code>3</code>（<code>count</code>），可观察到 <code>MA-10-01</code> 颜色已更新为 <code>香槟金</code>、<code>MB-20-02</code> 已被移除、仅余 <code>MA-10-01</code> 与 <code>MC-30-03</code> 两笔记录，且 <code>Current count: 2</code>。</li>
+</ul>
+</li>
+</ol>
+<h4>固定时间例子与计费边界核对表</h4>
+<p>若以固定查询时刻 <code>2026-11-18 18:30</code> 为基准，各典型停留时长的计算结果对照如下：</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">模拟入场时间</th>
+  <th style="text-align:left">基准时间下的停留时长（<code>Duration</code>）</th>
+  <th style="text-align:left">计费过程说明</th>
+  <th style="text-align:left">应收费用（<code>Fee</code>）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><code>2026-11-18 18:30</code></td>
+  <td style="text-align:left"><code>0 days 0 hours 0 minutes</code></td>
+  <td style="text-align:left">停留 0 分钟，不收费</td>
+  <td style="text-align:left"><code>0 MOP</code></td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>2026-11-18 17:30</code></td>
+  <td style="text-align:left"><code>0 days 1 hours 0 minutes</code></td>
+  <td style="text-align:left">刚好 60 分钟，计 1 小时</td>
+  <td style="text-align:left"><code>20 MOP</code></td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>2026-11-18 17:29</code></td>
+  <td style="text-align:left"><code>0 days 1 hours 1 minutes</code></td>
+  <td style="text-align:left">61 分钟进入第 2 计费小时</td>
+  <td style="text-align:left"><code>40 MOP</code></td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>2026-11-17 22:30</code></td>
+  <td style="text-align:left"><code>0 days 20 hours 0 minutes</code></td>
+  <td style="text-align:left">20 小时达单日封顶上限</td>
+  <td style="text-align:left"><code>400 MOP</code></td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>2026-11-17 18:30</code></td>
+  <td style="text-align:left"><code>1 days 0 hours 0 minutes</code></td>
+  <td style="text-align:left">1 个完整 24 小时周期</td>
+  <td style="text-align:left"><code>400 MOP</code></td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>2026-11-17 18:29</code></td>
+  <td style="text-align:left"><code>1 days 0 hours 1 minutes</code></td>
+  <td style="text-align:left">首日封顶 <code>400</code> + 次日第 1 小时 <code>20</code></td>
+  <td style="text-align:left"><code>420 MOP</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5.4 常见输入错误、数据文件格式与保存失败处理</h3>
+<p><strong>本机数据文件格式（<code>parking_data.txt</code>）</strong>：采 UTF-8 纯文字档，首行为标记 <code># PARKING_SYSTEM_V1</code>，其后每行一辆车，依车牌升序以单个 Tab（<code>\t</code>）分隔四栏（<code>车牌\t品类\t颜色\tYYYY-MM-DD HH:MM</code>）。</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:left">终端提示信息</th>
+  <th style="text-align:left">常见原因与处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left"><code>Invalid choice.</code></td>
+  <td style="text-align:left">输入了当前菜单不支持的编号（例如普通用户输入 <code>4</code>）。请依菜单提示重新输入。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Invalid required field.</code></td>
+  <td style="text-align:left">车牌、品类或颜色为空、含控制字元（如 Tab），或车牌内部含空格（如 <code>MA 10</code>）。请修正格式后重试。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Invalid entry time.</code></td>
+  <td style="text-align:left">时间未符合 16 字元 <code>YYYY-MM-DD HH:MM</code> 格式（如缺少前导零 <code>2026-1-2 8:00</code>）或日期不存在（如 <code>2026-02-29</code>）。请按正确格式重输。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Entry time is in the future.</code></td>
+  <td style="text-align:left">入场时间晚于当前系统时间（精确到分钟）。请输入过去或当前时间点。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Plate already exists.</code></td>
+  <td style="text-align:left">新增时车牌已存在，或修改车牌时新车牌已被场内他车占用。请改用唯一车牌。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Vehicle not found.</code></td>
+  <td style="text-align:left">查找、修改或删除的目标车牌不在场内。可先用 <code>1</code>（<code>list</code>）确认目前车牌清单。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Updated in memory, but save failed: &lt;reason&gt;</code></td>
+  <td style="text-align:left"><strong>仅内存更新警告</strong>：管理员修改已在本次会话生效，但写入文件失败（例如目录只读或权限不足）。请勿直接强制关闭程序，应依 <code>&lt;reason&gt;</code> 排除权限或文件冲突后再试保存或正常退出。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Line N: expected four tab-separated fields.</code> / <code>invalid timestamp.</code> / <code>duplicate plate.</code></td>
+  <td style="text-align:left">启动载入时发现 <code>parking_data.txt</code> 第 <code>N</code> 行格式损坏或重复。系统为保护既有数据而拒绝覆盖并结束（退出码 <code>1</code>）；请用文字编辑器修正第 <code>N</code> 行后再重启程序。</td>
+</tr>
+<tr>
+  <td style="text-align:left"><code>Save blocked: resolve the load or recovery error and reload first.</code></td>
+  <td style="text-align:left">因载入失败、备份恢复失败或保存前发现既有文件已遭外部改坏而触发安全锁定。请先保留并检查 <code>parking_data.txt</code> 与 <code>.bak</code> 档，修复后重新启动程序。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>第六章　项目总结</h2>
+<p>本次课程项目以 C++17 标准库实作了澳门本地酒店停车场管理系统，透过分文件模块设计将 <strong>汽车信息模块（1.1）</strong>、<strong>普通用户模块（1.2）</strong> 与 <strong>管理员用户模块（1.3）</strong> 清楚解耦：控制台菜单只负责互动与角色隔离，核心服务层集中把关字段、时间与车牌唯一性，计费函式以分钟对齐确保分段封顶收费一致，而本机存储模块则利用 <code>.tmp</code> 与 <code>.bak</code> 机制防止写入文件意外毁损数据。</p>
+<p>透过第五章的完整操作案例与固定时间边界对照，系统已验证空车库提示、普通用户越权拦截、管理员新增／修改／删除、三种计费边界（<code>20 MOP</code>、<code>40 MOP</code>、<code>420 MOP</code>）以及跨进程重启后数据完整保留等核心需求。在后续优化上，<strong>最值得优先改进的一点是为管理员删除操作增加二次确认提示</strong>（先显示匹配车辆再确认删除），其次再加入待保存状态旗标以省去退出时的重复写入文件，进一步兼顾操作安全性与程序简洁度。</p>
+
+</body>
+</html>
